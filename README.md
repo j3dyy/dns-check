@@ -43,4 +43,4 @@ docker run -d -p 8082:8082 --name dns-usectl dns-usectl
 
 Contributions are welcomed via pull requests!
 1. Add new DoH edge resolvers in `data/resolvers.json`.
-2. Submit a PR to `github.com/j3dyy/dns-usectl`.
+2. Submit a PR to `github.com/j3dyy/dns-check`.
