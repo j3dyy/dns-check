@@ -1,0 +1,36 @@
+# DNS.usectl.com - Robots & AI Policy
+# Manifest: https://dns.usectl.com/llms.txt
+# Machine Data: https://dns.usectl.com/data/resolvers.json
+
+User-agent: *
+Allow: /
+
+# Welcome AI search agents & LLMs
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+Sitemap: https://dns.usectl.com/sitemap.xml

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DNS.usectl.com OG Card</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #060913;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 64px 72px;
+      position: relative;
+    }
+
+    /* Ambient Glows */
+    .glow-cyan {
+      position: absolute;
+      top: -100px;
+      right: -80px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0) 70%);
+      pointer-events: none;
+    }
+    .glow-emerald {
+      position: absolute;
+      bottom: -120px;
+      left: 100px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%);
+      pointer-events: none;
+    }
+
+    /* Subtle grid */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .brand-title {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+    }
+    .brand-accent {
+      color: #38bdf8;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .ecosystem-tag {
+      font-size: 22px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: -0.01em;
+    }
+    .ecosystem-tag span {
+      color: #38bdf8;
+    }
+
+    /* Hero */
+    .hero-content {
+      z-index: 10;
+      margin-top: 10px;
+    }
+    .headline {
+      font-size: 58px;
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #f1f5f9;
+      max-width: 980px;
+    }
+    .headline span {
+      background: linear-gradient(135deg, #38bdf8 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subhead {
+      margin-top: 16px;
+      font-size: 23px;
+      color: #94a3b8;
+      line-height: 1.4;
+      max-width: 920px;
+    }
+
+    /* Feature Pills */
+    .feature-strip {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+      z-index: 10;
+    }
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .pill-icon {
+      color: #38bdf8;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 24px;
+      z-index: 10;
+    }
+    .footer-label {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .nodes-list {
+      display: flex;
+      gap: 12px;
+    }
+    .node-chip {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-cyan"></div>
+  <div class="glow-emerald"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <svg width="58" height="58" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ogDnsBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#070a13" />
+          </linearGradient>
+          <linearGradient id="ogRadarCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#0284c7" />
+          </linearGradient>
+          <linearGradient id="ogSweep" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="48" height="48" rx="12" fill="url(#ogDnsBg)" />
+        <rect x="1" y="1" width="46" height="46" rx="11" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+        <circle cx="24" cy="24" r="17" stroke="rgba(56, 189, 248, 0.16)" stroke-width="1.2" stroke-dasharray="2 3" />
+        <circle cx="24" cy="24" r="12" stroke="rgba(56, 189, 248, 0.28)" stroke-width="1.2" />
+        <circle cx="24" cy="24" r="6" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2" />
+        <line x1="24" y1="8" x2="24" y2="40" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" />
+        <line x1="8" y1="24" x2="40" y2="24" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" />
+        <path d="M24 24 L24 7 A17 17 0 0 1 41 24 Z" fill="url(#ogSweep)" />
+        <circle cx="15" cy="17" r="2.2" fill="#38bdf8" />
+        <circle cx="33" cy="16" r="2.2" fill="#10b981" />
+        <circle cx="34" cy="31" r="2.2" fill="#818cf8" />
+        <circle cx="16" cy="32" r="2.2" fill="#38bdf8" />
+        <circle cx="24" cy="24" r="3.5" fill="url(#ogRadarCyan)" />
+        <circle cx="24" cy="24" r="1.5" fill="#ffffff" />
+      </svg>
+      <div>
+        <span class="brand-title">DNS<span class="brand-accent">.usectl</span></span>
+      </div>
+      <div class="brand-badge">⚡ Global Edge Radar</div>
+    </div>
+    <div class="ecosystem-tag">
+      <span>dns</span>.usectl.com
+    </div>
+  </div>
+
+  <!-- Hero Content -->
+  <div class="hero-content">
+    <h1 class="headline">
+      Zero-Bloat <span>Global DNS &amp; SSL</span> Propagation Radar.
+    </h1>
+    <p class="subhead">
+      Check DNS propagation across 20+ global edge resolvers in parallel. Ad-free, sub-200ms latency, expected record diffing, and SSL certificate expiration monitoring.
+    </p>
+
+    <!-- Feature Strip -->
+    <div class="feature-strip">
+      <div class="pill"><span class="pill-icon">✓</span> 20+ Global Anycast Resolvers</div>
+      <div class="pill"><span class="pill-icon">⚡</span> A, AAAA, CNAME, MX, TXT, NS</div>
+      <div class="pill"><span class="pill-icon">🎯</span> Expected Value Diff Matcher</div>
+      <div class="pill"><span class="pill-icon">🔒</span> SSL/TLS Expiration Inspector</div>
+      <div class="pill"><span class="pill-icon">💻</span> 1-Click Terminal Dig Snippets</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span class="footer-label">Powered by usectl.com</span>
+    <div class="nodes-list">
+      <div class="node-chip">Cloudflare (1.1.1.1)</div>
+      <div class="node-chip">Google (8.8.8.8)</div>
+      <div class="node-chip">Quad9 (9.9.9.9)</div>
+      <div class="node-chip">OpenDNS</div>
+      <div class="node-chip">Control D</div>
+      <div class="node-chip">AdGuard</div>
+    </div>
+  </div>
+</body>
+</html>

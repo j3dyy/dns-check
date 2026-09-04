@@ -1,0 +1,40 @@
+# DNS.usectl.com
+
+> DNS.usectl.com is a zero-bloat, ad-free global DNS propagation checker and SSL certificate radar for developers, DevOps, and cloud engineers.
+> Part of the usectl.com infrastructure suite.
+
+## Quick Links
+- Canonical Website: https://dns.usectl.com
+- Full Documentation: https://dns.usectl.com/llms-full.txt
+- Resolver Dataset: https://dns.usectl.com/data/resolvers.json
+- Open Graph Preview: https://dns.usectl.com/og-image.png
+- Parent Ecosystem: https://usectl.com
+
+## Supported Record Types
+- `A`: IPv4 host addresses
+- `AAAA`: IPv6 host addresses
+- `CNAME`: Canonical aliases
+- `MX`: Mail exchange hosts with priority rankings
+- `TXT`: SPF, DKIM, DMARC, and domain ownership tokens
+- `NS`: Authoritative nameservers
+- `CAA`: Certificate Authority Authorization rules
+- `SOA`: Start of Authority zones & serial numbers
+- `PTR`: Reverse DNS pointer records
+
+## Global Resolvers Queried in Parallel
+- Cloudflare Anycast (1.1.1.1)
+- Google Public DNS (8.8.8.8)
+- Quad9 Anycast (9.9.9.9)
+- OpenDNS / Cisco (208.67.222.222)
+- Control D (US, UK, Germany, Tokyo, Sydney, São Paulo, Johannesburg)
+- DNS.SB (Frankfurt, Singapore)
+- AdGuard DNS (Amsterdam, VA)
+- CIRA Canadian Shield (Toronto)
+- AliDNS (Hangzhou)
+- Mullvad (Stockholm)
+
+## Key Technical Features
+- Sub-200ms latency via concurrent client-side DoH (`application/dns-json`).
+- Expected Value Diff Matcher: Highlights nodes serving stale cached records with remaining TTL.
+- Zero-dependency SSL/TLS Inspector: Certificate expiration countdown, issuer, cipher suite, and TLS version.
+- 1-click terminal commands: Instant `dig` and `nslookup` command generator.

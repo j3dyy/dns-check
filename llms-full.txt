@@ -1,0 +1,54 @@
+# DNS.usectl.com — Full Technical Reference
+> Source: https://dns.usectl.com | Parent: https://usectl.com
+
+## 1. Overview
+DNS.usectl.com replaces bloated, ad-ridden legacy DNS checkers (e.g. whatsmydns) with an instant, ad-free edge propagation radar.
+
+## 2. API & Resolver Endpoints
+| Resolver | Region | Location | Protocol | Format |
+| :--- | :--- | :--- | :--- | :--- |
+| Cloudflare | Anycast | 300+ PoPs | DoH | JSON (RFC 8427) |
+| Google Public DNS | Anycast | Global | DoH | Google JSON |
+| Quad9 | Anycast | Zurich HQ | DoH | JSON (RFC 8427) |
+| OpenDNS | North America | San Jose, CA | DoH | JSON (RFC 8427) |
+| Control D | North America | Ashburn, VA | DoH | JSON (RFC 8427) |
+| CIRA Canadian Shield | North America | Toronto, CA | DoH | JSON (RFC 8427) |
+| DNS.SB | Europe | Frankfurt, DE | DoH | JSON (RFC 8427) |
+| DNS0.EU | Europe | Paris, FR | DoH | JSON (RFC 8427) |
+| AdGuard | Europe | Amsterdam, NL | DoH | JSON (RFC 8427) |
+| Mullvad | Europe | Stockholm, SE | DoH | JSON (RFC 8427) |
+| AliDNS | Asia | Hangzhou, CN | DoH | Google JSON |
+| DNS.SB | Asia | Singapore, SG | DoH | JSON (RFC 8427) |
+| Control D | Asia | Tokyo, JP | DoH | JSON (RFC 8427) |
+| Control D | Oceania | Sydney, AU | DoH | JSON (RFC 8427) |
+| Control D | Latin America | São Paulo, BR | DoH | JSON (RFC 8427) |
+| Control D | Africa | Johannesburg, ZA | DoH | JSON (RFC 8427) |
+
+## 3. SSL/TLS Inspection Endpoint
+Endpoint: `/api/ssl?domain={domain}`
+Returns:
+```json
+{
+  "success": true,
+  "domain": "usectl.com",
+  "valid": true,
+  "daysRemaining": 78,
+  "expiresAt": "2026-11-20 12:00 UTC",
+  "issuer": "Let's Encrypt",
+  "tlsVersion": "TLSv1.3",
+  "cipher": "TLS_AES_256_GCM_SHA384",
+  "sans": ["usectl.com", "*.usectl.com"]
+}
+```
+
+## 4. CLI Usage Examples
+```bash
+# Query A record via Cloudflare
+dig +short A usectl.com @1.1.1.1
+
+# Query TXT records via Google
+dig +short TXT usectl.com @8.8.8.8
+
+# DoH JSON query
+curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=usectl.com&type=A'
+```
