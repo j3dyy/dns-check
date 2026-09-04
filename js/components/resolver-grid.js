@@ -59,7 +59,7 @@ function mountGridStructure(mountEl) {
                 </div>
 
                 <div class="resolver-meta-badges">
-                  <button class="btn-card-nslookup" id="btn-nslookup-${r.id}" title="Inspect nslookup session">
+                  <button class="btn-card-nslookup" id="btn-nslookup-${r.id}" title="Inspect nslookup session" aria-label="Inspect ${r.name} nslookup session">
                     ${icons.terminal(12)}
                   </button>
                   <span class="latency-badge" id="latency-${r.id}" style="display: none;"></span>

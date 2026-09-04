@@ -22,18 +22,23 @@ export function renderSearchBar(mountEl) {
       <div class="container">
         <div class="hero-search-card">
           <!-- Domain Input Row -->
-          <form id="dns-query-form" class="search-input-row">
-            <div class="search-icon-wrap">${icons.search(20)}</div>
-            <input
-              type="text"
-              id="domain-input"
-              class="domain-input"
-              placeholder="Enter domain or IP (e.g. usectl.com, github.com)"
-              value="${store.domain || ""}"
-              autocomplete="off"
-              spellcheck="false"
-              required
-            />
+          <form id="dns-query-form" class="search-form-wrap">
+            <div class="search-input-box">
+              <div class="search-icon-wrap">${icons.search(18)}</div>
+              <input
+                type="text"
+                id="domain-input"
+                class="domain-input"
+                placeholder="Enter domain or IP (e.g. usectl.com, github.com)"
+                value="${store.domain || ""}"
+                autocomplete="off"
+                spellcheck="false"
+                required
+              />
+              <button type="button" id="btn-clear-domain" class="btn-clear-domain ${store.domain ? '' : 'is-hidden'}" title="Clear input" aria-label="Clear input">
+                ${icons.x(14)}
+              </button>
+            </div>
             <button type="submit" class="query-action-btn" id="btn-submit-query">
               <span id="btn-query-icon" class="${isQuerying ? "is-spinning" : ""}">${icons.refresh(16)}</span>
               <span id="btn-query-text">${isQuerying ? "Probing..." : "Test DNS"}</span>
@@ -43,7 +48,7 @@ export function renderSearchBar(mountEl) {
           <!-- Recent Searches History Strip -->
           <div class="sample-try-row recent-history-row" id="recent-searches-row" style="${store.recentSearches.length > 0 ? '' : 'display: none;'}">
             <span class="sample-label">RECENT:</span>
-            <div class="recent-chips-wrap" id="recent-chips-container">
+            <div class="recent-chips-wrap sample-chips-scroll" id="recent-chips-container">
               ${renderRecentChips(store.recentSearches)}
             </div>
           </div>
@@ -51,10 +56,12 @@ export function renderSearchBar(mountEl) {
           <!-- Quick Demo Suggestions Strip -->
           <div class="sample-try-row">
             <span class="sample-label">QUICK TEST:</span>
-            <button type="button" class="sample-chip" data-domain="usectl.com">usectl.com</button>
-            <button type="button" class="sample-chip" data-domain="github.com">github.com</button>
-            <button type="button" class="sample-chip" data-domain="cloudflare.com">cloudflare.com</button>
-            <button type="button" class="sample-chip" data-domain="google.com">google.com</button>
+            <div class="sample-chips-scroll">
+              <button type="button" class="sample-chip" data-domain="usectl.com">usectl.com</button>
+              <button type="button" class="sample-chip" data-domain="github.com">github.com</button>
+              <button type="button" class="sample-chip" data-domain="cloudflare.com">cloudflare.com</button>
+              <button type="button" class="sample-chip" data-domain="google.com">google.com</button>
+            </div>
           </div>
 
           <!-- Record Type Selector Row -->
@@ -73,7 +80,7 @@ export function renderSearchBar(mountEl) {
           <!-- Expected Value Row (Optional diff checker) -->
           <div class="expected-toggle-row">
             <div class="expected-input-wrap">
-              <span style="color: var(--text-dim); font-size: 0.8rem; font-weight: 600;">EXPECTED:</span>
+              <span class="expected-label">EXPECTED:</span>
               <input
                 type="text"
                 id="expected-input"
@@ -81,7 +88,7 @@ export function renderSearchBar(mountEl) {
                 value="${store.expectedValue}"
               />
             </div>
-            <div style="font-size: 0.78rem; color: var(--text-dim);">
+            <div class="desktop-shortcut-hints">
               Press <kbd style="background: var(--bg-surface); padding: 2px 5px; border-radius: 4px; font-family: var(--font-mono);">/</kbd> to search &bull; Press <kbd style="background: var(--bg-surface); padding: 2px 5px; border-radius: 4px; font-family: var(--font-mono);">R</kbd> to refresh
             </div>
           </div>
@@ -125,6 +132,28 @@ export function renderSearchBar(mountEl) {
       }
       store.setRecordType(type);
     });
+  });
+
+  // Clear domain button
+  const clearBtn = document.getElementById("btn-clear-domain");
+  const domainInput = document.getElementById("domain-input");
+  
+  domainInput?.addEventListener("input", (e) => {
+    if (clearBtn) {
+      if (e.target.value) {
+        clearBtn.classList.remove("is-hidden");
+      } else {
+        clearBtn.classList.add("is-hidden");
+      }
+    }
+  });
+
+  clearBtn?.addEventListener("click", () => {
+    if (domainInput) {
+      domainInput.value = "";
+      domainInput.focus();
+      clearBtn.classList.add("is-hidden");
+    }
   });
 
   // Expected Value Input
@@ -179,9 +208,18 @@ export function updateSearchBarState() {
   const icon = document.getElementById("btn-query-icon");
   const text = document.getElementById("btn-query-text");
   const domainInput = document.getElementById("domain-input");
+  const clearBtn = document.getElementById("btn-clear-domain");
 
   if (domainInput && document.activeElement !== domainInput && domainInput.value !== store.domain) {
     domainInput.value = store.domain;
+  }
+
+  if (clearBtn && domainInput) {
+    if (domainInput.value) {
+      clearBtn.classList.remove("is-hidden");
+    } else {
+      clearBtn.classList.add("is-hidden");
+    }
   }
 
   if (icon && text) {

@@ -141,35 +141,39 @@ export function renderNslookupView(mountEl) {
           <div class="terminal-card large-terminal">
             <!-- Window Titlebar -->
             <div class="terminal-titlebar">
-              <div class="terminal-dots">
-                <span class="dot dot-red"></span>
-                <span class="dot dot-yellow"></span>
-                <span class="dot dot-green"></span>
+              <div class="terminal-title-left">
+                <div class="terminal-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+
+                <div class="terminal-center-title">
+                  ${icons.terminal(13)}
+                  <span>nslookup &mdash; ${selectedResolver.name} (${selectedResolver.ip}#53)</span>
+                </div>
               </div>
 
-              <div class="terminal-center-title">
-                ${icons.terminal(13)}
-                <span>nslookup &mdash; ${selectedResolver.name} (${selectedResolver.ip}#53)</span>
-              </div>
+              <div class="terminal-title-right">
+                <div class="terminal-tab-switch">
+                  <button class="term-tab ${activeTool === 'nslookup' ? 'active' : ''}" id="tab-cross-nslookup">
+                    nslookup
+                  </button>
+                  <button class="term-tab ${activeTool === 'dig' ? 'active' : ''}" id="tab-cross-dig">
+                    dig
+                  </button>
+                </div>
 
-              <div class="terminal-tab-switch">
-                <button class="term-tab ${activeTool === 'nslookup' ? 'active' : ''}" id="tab-cross-nslookup">
-                  nslookup
-                </button>
-                <button class="term-tab ${activeTool === 'dig' ? 'active' : ''}" id="tab-cross-dig">
-                  dig
-                </button>
-              </div>
-
-              <div class="terminal-actions">
-                <button class="btn-copy-term" id="btn-cross-copy-cmd" title="Copy Command">
-                  ${icons.copy(13)}
-                  <span>Copy Cmd</span>
-                </button>
-                <button class="btn-copy-term" id="btn-cross-copy-output" title="Copy Output">
-                  ${icons.copy(13)}
-                  <span>Copy Output</span>
-                </button>
+                <div class="terminal-actions">
+                  <button class="btn-copy-term" id="btn-cross-copy-cmd" title="Copy Command">
+                    ${icons.copy(13)}
+                    <span>Copy Cmd</span>
+                  </button>
+                  <button class="btn-copy-term" id="btn-cross-copy-output" title="Copy Output">
+                    ${icons.copy(13)}
+                    <span>Copy Output</span>
+                  </button>
+                </div>
               </div>
             </div>
 

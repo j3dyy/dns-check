@@ -56,40 +56,42 @@ export function renderConsensusBar(mountEl) {
         </div>
 
         <div class="consensus-right">
-          ${dnssec !== null ? `
-            <div class="dnssec-pill ${dnssec ? 'valid' : 'unsigned'}" title="${dnssec ? 'DNSSEC Authenticated Data (AD) Flag Verified' : 'DNSSEC Not Configured or Unsigned'}">
-              ${dnssec ? icons.shield(12) : ''}
-              <span>${dnssec ? 'DNSSEC Valid' : 'DNSSEC Unsigned'}</span>
-            </div>
-          ` : ""}
+          <div class="consensus-badges-group">
+            ${dnssec !== null ? `
+              <div class="dnssec-pill ${dnssec ? 'valid' : 'unsigned'}" title="${dnssec ? 'DNSSEC Authenticated Data (AD) Flag Verified' : 'DNSSEC Not Configured or Unsigned'}">
+                ${dnssec ? icons.shield(12) : ''}
+                <span>${dnssec ? 'DNSSEC Valid' : 'DNSSEC Unsigned'}</span>
+              </div>
+            ` : ""}
 
-          ${http && http.status ? `
-            <div class="http-pill ${http.status < 400 ? 'ok' : 'warn'}" title="Web Server: ${http.server || 'Unknown'} • Redirect: ${http.redirectCount || 0} hops">
-              <span class="http-live-dot"></span>
-              <span>HTTP ${http.status} &bull; ${http.ttfb}ms</span>
-            </div>
-          ` : ""}
+            ${http && http.status ? `
+              <div class="http-pill ${http.status < 400 ? 'ok' : 'warn'}" title="Web Server: ${http.server || 'Unknown'} • Redirect: ${http.redirectCount || 0} hops">
+                <span class="http-live-dot"></span>
+                <span>HTTP ${http.status} &bull; ${http.ttfb}ms</span>
+              </div>
+            ` : ""}
 
-          ${ssl && ssl.success ? `
-            <button class="ssl-pill" id="btn-open-ssl-modal" title="View SSL/TLS Certificate Info">
-              ${icons.lock(14)}
-              <span>SSL Valid: ${ssl.daysRemaining}d left (${ssl.issuer})</span>
-            </button>
-          ` : ssl && ssl.error ? `
-            <button class="ssl-pill" style="color: var(--brand-rose); border-color: rgba(244,63,94,0.3); background: rgba(244,63,94,0.08);" id="btn-open-ssl-modal">
-              ${icons.alertTriangle(14)}
-              <span>SSL Warning</span>
-            </button>
-          ` : ""}
+            ${ssl && ssl.success ? `
+              <button class="ssl-pill" id="btn-open-ssl-modal" title="SSL Certificate Valid: ${ssl.daysRemaining}d left (${ssl.issuer}) - Click to inspect">
+                ${icons.lock(13)}
+                <span>SSL Valid: ${ssl.daysRemaining}d</span>
+              </button>
+            ` : ssl && ssl.error ? `
+              <button class="ssl-pill" style="color: var(--brand-rose); border-color: rgba(244,63,94,0.3); background: rgba(244,63,94,0.08);" id="btn-open-ssl-modal" title="SSL Certificate Error or Warning">
+                ${icons.alertTriangle(13)}
+                <span>SSL Warning</span>
+              </button>
+            ` : ""}
+          </div>
 
           <div class="view-mode-toggle">
             <button class="view-mode-btn ${store.viewMode === 'grid' ? 'active' : ''}" id="btn-view-grid" title="Standard Resolver Grid View">
               ${icons.grid(13)}
-              <span>Grid</span>
+              <span>Grid View</span>
             </button>
             <button class="view-mode-btn ${store.viewMode === 'nslookup' ? 'active' : ''}" id="btn-view-nslookup" title="nslookup Cross-Check Terminal Workstation">
               ${icons.terminal(13)}
-              <span>nslookup Cross-Check</span>
+              <span>nslookup</span>
             </button>
           </div>
         </div>

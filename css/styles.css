@@ -49,7 +49,15 @@
   
   /* Layout */
   --max-width: 1360px;
-  --header-height: 68px;
+  --header-height: 64px;
+  --container-padding: 24px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 56px;
+    --container-padding: 14px;
+  }
 }
 
 [data-theme="light"] {
@@ -81,17 +89,25 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-main);
   font-family: var(--font-sans);
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   overflow-x: hidden;
+  position: relative;
 }
 
 /* Ambient Background Glow */
@@ -114,8 +130,8 @@ body {
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
   position: relative;
   z-index: 1;
 }

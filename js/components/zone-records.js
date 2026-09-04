@@ -84,17 +84,17 @@ export function renderZoneRecords(mountEl) {
             </div>
 
             <div class="zone-header-actions">
-              <button type="button" class="btn-zone-export" id="btn-export-bind" title="Export as standard RFC 1035 BIND Zone File">
+              <button type="button" class="btn-zone-export" id="btn-export-bind" title="Export as standard RFC 1035 BIND Zone File" aria-label="Export BIND Zone File">
                 ${icons.fileText(12)} <span>BIND Zone</span>
               </button>
-              <button type="button" class="btn-zone-export" id="btn-export-json" title="Export DNS Records as JSON">
+              <button type="button" class="btn-zone-export" id="btn-export-json" title="Export DNS Records as JSON" aria-label="Export JSON">
                 ${icons.download(12)} <span>JSON</span>
               </button>
               <span class="zone-count-badge">
-                <span class="count-num">${totalCount}</span> Records Discovered
+                <span class="count-num">${totalCount}</span> <span class="badge-text-full">Records Discovered</span><span class="badge-text-short">Records</span>
               </span>
               <button type="button" class="btn-zone-toggle" id="btn-toggle-zone" title="${isCollapsed ? "Expand" : "Collapse"} Zone Overview">
-                ${isCollapsed ? "Show All Records ▼" : "Hide ▲"}
+                ${isCollapsed ? "Show All ▼" : "Hide ▲"}
               </button>
             </div>
           </div>
