@@ -1,16 +1,26 @@
 /**
- * DNS.usectl.com - Global Resolver Grid Component
+ * DNS.usectl.com - Global Resolver Grid Component (Stable In-Place Updates)
  */
 import { icons } from "../utils/icons.js";
 import { formatLatency, formatTTL } from "../utils/formatters.js";
 import { store } from "../state.js";
 
+let isMounted = false;
+
 export function renderResolverGrid(mountEl) {
+  if (!isMounted) {
+    mountGridStructure(mountEl);
+    isMounted = true;
+  }
+  updateAllResolverCards();
+}
+
+/**
+ * Mount DOM elements ONCE with fixed geometry
+ */
+function mountGridStructure(mountEl) {
   const regions = store.regions;
   const resolvers = store.resolvers;
-  const results = store.results;
-  const expected = store.expectedValue;
-  const consensus = store.getConsensus();
 
   if (resolvers.length === 0) {
     mountEl.innerHTML = `
@@ -36,86 +46,33 @@ export function renderResolverGrid(mountEl) {
         </div>
 
         <div class="resolvers-grid">
-          ${regResolvers.map((r) => {
-            const res = results[r.id];
-            const isLoading = store.isLoading && !res;
-            const latencyObj = res ? formatLatency(res.latency) : null;
-
-            let cardClass = "";
-            let statusIcon = "";
-            let displayVal = "";
-            let ttlText = "";
-
-            if (isLoading) {
-              displayVal = `<span class="skeleton-loading">Querying node...</span>`;
-            } else if (res) {
-              if (res.success && res.primaryValue) {
-                displayVal = res.primaryValue;
-                ttlText = res.ttl ? `TTL ${formatTTL(res.ttl)}` : "";
-
-                // Check expected value matching
-                if (expected) {
-                  if (res.rawValues.includes(expected)) {
-                    cardClass = "is-matched";
-                    statusIcon = `<span style="color: var(--brand-emerald);">${icons.check(14)}</span>`;
-                  } else {
-                    cardClass = "is-differing";
-                    statusIcon = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
-                  }
-                } else if (consensus.dominantValue && res.primaryValue === consensus.dominantValue) {
-                  cardClass = "is-matched";
-                  statusIcon = `<span style="color: var(--brand-emerald);">${icons.check(14)}</span>`;
-                } else {
-                  cardClass = "is-differing";
-                  statusIcon = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
-                }
-              } else if (res.status === "nxdomain") {
-                displayVal = `<span style="color: var(--text-dim);">NXDOMAIN (Not Found)</span>`;
-                cardClass = "is-error";
-                statusIcon = `<span style="color: var(--brand-rose);">${icons.x(14)}</span>`;
-              } else if (res.status === "empty") {
-                displayVal = `<span style="color: var(--text-dim);">No ${store.recordType} Records</span>`;
-                cardClass = "is-differing";
-                statusIcon = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
-              } else {
-                displayVal = `<span style="color: var(--brand-rose);">${res.error || "Lookup Failed"}</span>`;
-                cardClass = "is-error";
-                statusIcon = `<span style="color: var(--brand-rose);">${icons.x(14)}</span>`;
-              }
-            } else {
-              displayVal = `<span style="color: var(--text-dim);">Waiting to query...</span>`;
-            }
-
-            return `
-              <div class="resolver-card ${cardClass} fade-in" id="card-${r.id}">
-                <div class="resolver-card-top">
-                  <div class="resolver-info">
-                    <span class="resolver-flag">${r.flag || "🌐"}</span>
-                    <div class="resolver-title-col">
-                      <span class="resolver-name">${r.name}</span>
-                      <span class="resolver-location">${r.location}</span>
-                    </div>
-                  </div>
-
-                  <div class="resolver-meta-badges">
-                    ${latencyObj ? `
-                      <span class="latency-badge ${latencyObj.status}">
-                        ${latencyObj.label}
-                      </span>
-                    ` : ""}
-                    ${statusIcon}
+          ${regResolvers.map((r) => `
+            <div class="resolver-card" id="card-${r.id}">
+              <div class="resolver-card-top">
+                <div class="resolver-info">
+                  <span class="resolver-flag">${r.flag || "🌐"}</span>
+                  <div class="resolver-title-col">
+                    <span class="resolver-name">${r.name}</span>
+                    <span class="resolver-location">${r.location}</span>
                   </div>
                 </div>
 
-                <div class="resolver-card-bottom" title="Click to copy record value" data-copy="${res?.primaryValue || ""}">
-                  <div class="record-val-row">
-                    <span class="record-val-text">${displayVal}</span>
-                    ${ttlText ? `<span class="record-ttl">${ttlText}</span>` : ""}
-                  </div>
+                <div class="resolver-meta-badges">
+                  <span class="latency-badge" id="latency-${r.id}" style="display: none;"></span>
+                  <span id="status-icon-${r.id}"></span>
                 </div>
               </div>
-            `;
-          }).join("")}
+
+              <div class="resolver-card-bottom" id="bottom-${r.id}" title="Click to copy record value">
+                <div class="record-val-row">
+                  <span class="record-val-text" id="val-${r.id}">
+                    <span class="skeleton-loading">Waiting to probe...</span>
+                  </span>
+                  <span class="record-ttl" id="ttl-${r.id}"></span>
+                </div>
+              </div>
+            </div>
+          `).join("")}
         </div>
       </section>
     `;
@@ -124,22 +81,107 @@ export function renderResolverGrid(mountEl) {
   html += `</div>`;
   mountEl.innerHTML = html;
 
-  // Add 1-click copy on cards
-  mountEl.querySelectorAll(".resolver-card-bottom").forEach((box) => {
-    box.addEventListener("click", () => {
-      const val = box.getAttribute("data-copy");
+  // Add click to copy
+  resolvers.forEach((r) => {
+    const bottom = document.getElementById(`bottom-${r.id}`);
+    bottom?.addEventListener("click", () => {
+      const val = bottom.getAttribute("data-copy");
       if (val) {
         navigator.clipboard.writeText(val);
-        const original = box.innerHTML;
-        box.innerHTML = `
-          <div class="record-val-row" style="color: var(--brand-emerald);">
-            <span>${icons.check(14)} Copied to clipboard!</span>
-          </div>
-        `;
-        setTimeout(() => {
-          box.innerHTML = original;
-        }, 1200);
+        const textEl = document.getElementById(`val-${r.id}`);
+        if (textEl) {
+          const original = textEl.textContent;
+          textEl.innerHTML = `<span style="color: var(--brand-emerald);">${icons.check(13)} Copied!</span>`;
+          setTimeout(() => {
+            textEl.textContent = original;
+          }, 1200);
+        }
       }
     });
   });
+}
+
+/**
+ * Update a single resolver card in-place with zero layout shift
+ */
+export function updateResolverCard(resolverId) {
+  const card = document.getElementById(`card-${resolverId}`);
+  if (!card) return;
+
+  const res = store.results[resolverId];
+  const expected = store.expectedValue;
+  const consensus = store.getConsensus();
+
+  const latencyEl = document.getElementById(`latency-${resolverId}`);
+  const statusIconEl = document.getElementById(`status-icon-${resolverId}`);
+  const valEl = document.getElementById(`val-${resolverId}`);
+  const ttlEl = document.getElementById(`ttl-${resolverId}`);
+  const bottomEl = document.getElementById(`bottom-${resolverId}`);
+
+  card.classList.remove("is-matched", "is-differing", "is-error", "is-probing");
+
+  if (!res) {
+    if (store.isLoading) {
+      card.classList.add("is-probing");
+      if (valEl) valEl.innerHTML = `<span class="skeleton-loading">Querying node...</span>`;
+    }
+    return;
+  }
+
+  // Update Latency
+  if (latencyEl && res.latency) {
+    const latObj = formatLatency(res.latency);
+    latencyEl.textContent = latObj.label;
+    latencyEl.className = `latency-badge ${latObj.status}`;
+    latencyEl.style.display = "inline-block";
+  }
+
+  // Update Status & Value
+  if (res.success && res.primaryValue) {
+    const val = res.primaryValue;
+    if (valEl) valEl.textContent = val;
+    if (ttlEl) ttlEl.textContent = res.ttl ? `TTL ${formatTTL(res.ttl)}` : "";
+    if (bottomEl) bottomEl.setAttribute("data-copy", val);
+
+    // Matching logic
+    if (expected) {
+      if (res.rawValues.includes(expected)) {
+        card.classList.add("is-matched");
+        if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-emerald);">${icons.check(14)}</span>`;
+      } else {
+        card.classList.add("is-differing");
+        if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
+      }
+    } else if (consensus.dominantValue && res.primaryValue === consensus.dominantValue) {
+      card.classList.add("is-matched");
+      if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-emerald);">${icons.check(14)}</span>`;
+    } else {
+      card.classList.add("is-differing");
+      if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
+    }
+  } else if (res.status === "nxdomain") {
+    card.classList.add("is-error");
+    if (valEl) valEl.innerHTML = `<span style="color: var(--text-dim);">NXDOMAIN (Not Found)</span>`;
+    if (ttlEl) ttlEl.textContent = "";
+    if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-rose);">${icons.x(14)}</span>`;
+  } else if (res.status === "empty") {
+    card.classList.add("is-differing");
+    if (valEl) valEl.innerHTML = `<span style="color: var(--text-dim);">No ${store.recordType} Records</span>`;
+    if (ttlEl) ttlEl.textContent = "";
+    if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
+  } else {
+    card.classList.add("is-error");
+    if (valEl) valEl.innerHTML = `<span style="color: var(--brand-rose);">${res.error || "Lookup Failed"}</span>`;
+    if (ttlEl) ttlEl.textContent = "";
+    if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-rose);">${icons.x(14)}</span>`;
+  }
+}
+
+/**
+ * Update all resolver cards in-place
+ */
+export function updateAllResolverCards() {
+  for (const r of store.resolvers) {
+    updateResolverCard(r.id);
+  }
 }

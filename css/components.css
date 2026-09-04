@@ -255,13 +255,15 @@
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 14px 20px;
   margin-bottom: 24px;
+  min-height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+  box-sizing: border-box;
 }
 
 .consensus-left {
@@ -278,6 +280,7 @@
   border-radius: var(--radius-full);
   font-weight: 700;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .consensus-badge.synced {
@@ -323,6 +326,7 @@
   color: var(--brand-cyan);
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .ssl-pill:hover {
@@ -353,74 +357,97 @@
   gap: 14px;
 }
 
-/* Resolver Card */
+/* Resolver Card - Fixed Geometry (Zero Jumping) */
 .resolver-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
+  border-left: 3px solid transparent;
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  justify-content: space-between;
+  height: 104px;
+  min-height: 104px;
+  max-height: 104px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   position: relative;
+  overflow: hidden;
 }
 
 .resolver-card:hover {
   border-color: var(--border-color);
   background: var(--bg-card-hover);
-  transform: translateY(-1px);
 }
 
 .resolver-card.is-matched {
-  border-left: 3px solid var(--brand-emerald);
+  border-left-color: var(--brand-emerald);
 }
 
 .resolver-card.is-differing {
-  border-left: 3px solid var(--brand-amber);
+  border-left-color: var(--brand-amber);
 }
 
 .resolver-card.is-error {
-  border-left: 3px solid var(--brand-rose);
+  border-left-color: var(--brand-rose);
+}
+
+.resolver-card.is-probing {
+  opacity: 0.85;
 }
 
 .resolver-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 36px;
+  min-height: 36px;
 }
 
 .resolver-info {
   display: flex;
   align-items: center;
   gap: 10px;
+  overflow: hidden;
 }
 
 .resolver-flag {
   font-size: 1.25rem;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .resolver-title-col {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .resolver-name {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .resolver-location {
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .resolver-meta-badges {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
+  min-width: 68px;
+  flex-shrink: 0;
 }
 
 .latency-badge {
@@ -431,6 +458,7 @@
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
   color: var(--text-muted);
+  line-height: 1.2;
 }
 
 .latency-badge.fast {
@@ -445,12 +473,22 @@
 
 .resolver-card-bottom {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  height: 34px;
+  min-height: 34px;
+  max-height: 34px;
   background: var(--bg-input);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  overflow: hidden;
+}
+
+.resolver-card-bottom:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .record-val-row {
@@ -458,20 +496,26 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  width: 100%;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.83rem;
+  overflow: hidden;
 }
 
 .record-val-text {
   color: var(--text-main);
-  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   user-select: all;
+  flex: 1;
 }
 
 .record-ttl {
   font-size: 0.72rem;
   color: var(--text-dim);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Modals */

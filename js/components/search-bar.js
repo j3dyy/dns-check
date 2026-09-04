@@ -6,7 +6,15 @@ import { store } from "../state.js";
 
 const RECORD_TYPES = ["A", "AAAA", "CNAME", "MX", "TXT", "NS", "CAA", "SOA", "PTR"];
 
+let isMounted = false;
+
 export function renderSearchBar(mountEl) {
+  if (isMounted) {
+    updateSearchBarState();
+    return;
+  }
+
+  isMounted = true;
   const isQuerying = store.isLoading;
 
   mountEl.innerHTML = `
@@ -27,13 +35,13 @@ export function renderSearchBar(mountEl) {
               required
             />
             <button type="submit" class="query-action-btn" id="btn-submit-query">
-              <span class="${isQuerying ? "is-spinning" : ""}">${icons.refresh(16)}</span>
-              <span>${isQuerying ? "Probing..." : "Test DNS"}</span>
+              <span id="btn-query-icon" class="${isQuerying ? "is-spinning" : ""}">${icons.refresh(16)}</span>
+              <span id="btn-query-text">${isQuerying ? "Probing..." : "Test DNS"}</span>
             </button>
           </form>
 
           <!-- Record Type Selector Row -->
-          <div class="record-types-row">
+          <div class="record-types-row" id="record-types-container">
             ${RECORD_TYPES.map((type) => `
               <button
                 type="button"
@@ -89,5 +97,35 @@ export function renderSearchBar(mountEl) {
   const expInput = document.getElementById("expected-input");
   expInput?.addEventListener("input", (e) => {
     store.setExpectedValue(e.target.value);
+  });
+}
+
+export function updateSearchBarState() {
+  const icon = document.getElementById("btn-query-icon");
+  const text = document.getElementById("btn-query-text");
+  const domainInput = document.getElementById("domain-input");
+
+  if (domainInput && document.activeElement !== domainInput && domainInput.value !== store.domain) {
+    domainInput.value = store.domain;
+  }
+
+  if (icon && text) {
+    if (store.isLoading) {
+      icon.classList.add("is-spinning");
+      text.textContent = "Probing...";
+    } else {
+      icon.classList.remove("is-spinning");
+      text.textContent = "Test DNS";
+    }
+  }
+
+  const pills = document.querySelectorAll(".record-type-pill");
+  pills.forEach((p) => {
+    const type = p.getAttribute("data-type");
+    if (type === store.recordType) {
+      p.classList.add("active");
+    } else {
+      p.classList.remove("active");
+    }
   });
 }

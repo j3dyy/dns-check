@@ -1,11 +1,11 @@
 /**
- * DNS.usectl.com - Application Bootstrap & Coordinator
+ * DNS.usectl.com - Application Bootstrap & Coordinator (No-Jump Reactive Flow)
  */
 import { store } from "./state.js";
 import { renderHeader } from "./components/header.js";
-import { renderSearchBar } from "./components/search-bar.js";
+import { renderSearchBar, updateSearchBarState } from "./components/search-bar.js";
 import { renderConsensusBar } from "./components/consensus-bar.js";
-import { renderResolverGrid } from "./components/resolver-grid.js";
+import { renderResolverGrid, updateResolverCard, updateAllResolverCards } from "./components/resolver-grid.js";
 import { initCliModal } from "./components/cli-modal.js";
 import { initSslModal } from "./components/ssl-modal.js";
 
@@ -26,12 +26,36 @@ async function init() {
   initCliModal(modalMount);
   initSslModal(modalMount);
 
-  // Subscribe reactive updates
-  store.subscribe(() => {
-    renderHeader(headerMount);
-    renderSearchBar(searchMount);
+  // Render stable structures once
+  renderHeader(headerMount);
+  renderSearchBar(searchMount);
+  renderConsensusBar(consensusMount);
+
+  // Subscribe fine-grained reactive updates
+  store.subscribe((state, action) => {
+    // 1. Consensus bar updates smoothly
     renderConsensusBar(consensusMount);
-    renderResolverGrid(gridMount);
+
+    // 2. Search bar updates button spinner & active pills without rebuilding inputs
+    updateSearchBarState();
+
+    // 3. Resolver cards update in-place with zero DOM destruction
+    if (action?.type === "resolver-update") {
+      updateResolverCard(action.resolverId);
+    } else if (action?.type === "resolvers-loaded") {
+      renderResolverGrid(gridMount);
+    } else if (action?.type === "expected-updated") {
+      updateAllResolverCards();
+    } else if (action?.type === "start-probing") {
+      // Mark cards as probing smoothly without layout shift
+      document.querySelectorAll(".resolver-card").forEach((card) => {
+        card.classList.add("is-probing");
+      });
+    } else if (action?.type === "theme-toggled") {
+      renderHeader(headerMount);
+    } else {
+      updateAllResolverCards();
+    }
   });
 
   // Setup Global Keyboard Shortcuts

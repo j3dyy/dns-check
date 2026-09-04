@@ -25,9 +25,9 @@ class DNSStore {
     return () => this.listeners.delete(listener);
   }
 
-  notify() {
+  notify(action = null) {
     for (const listener of this.listeners) {
-      listener(this);
+      listener(this, action);
     }
   }
 
@@ -37,7 +37,7 @@ class DNSStore {
       const data = await res.json();
       this.resolvers = data.resolvers || [];
       this.regions = data.regions || [];
-      this.notify();
+      this.notify({ type: "resolvers-loaded" });
     } catch (err) {
       console.error("[DNS.usectl.com] Failed to load resolvers:", err);
     }
@@ -56,14 +56,14 @@ class DNSStore {
 
   setExpectedValue(val) {
     this.expectedValue = val.trim();
-    this.notify();
+    this.notify({ type: "expected-updated" });
   }
 
   toggleTheme() {
     this.theme = this.theme === "dark" ? "light" : "dark";
     localStorage.setItem("dns_theme", this.theme);
     document.documentElement.setAttribute("data-theme", this.theme);
-    this.notify();
+    this.notify({ type: "theme-toggled" });
   }
 
   updateUrlParams() {
@@ -85,9 +85,8 @@ class DNSStore {
     if (!this.domain || !isValidDomain(this.domain)) return;
 
     this.isLoading = true;
-    this.results = {};
     this.sslInfo = null;
-    this.notify();
+    this.notify({ type: "start-probing" });
 
     // Trigger SSL inspection in parallel
     this.fetchSSLInfo(this.domain);
@@ -96,12 +95,12 @@ class DNSStore {
     const promises = this.resolvers.map(async (resolver) => {
       const result = await queryResolver(resolver, this.domain, this.recordType);
       this.results[resolver.id] = result;
-      this.notify();
+      this.notify({ type: "resolver-update", resolverId: resolver.id });
     });
 
     await Promise.allSettled(promises);
     this.isLoading = false;
-    this.notify();
+    this.notify({ type: "finished-probing" });
   }
 
   async fetchSSLInfo(domain) {
@@ -111,7 +110,7 @@ class DNSStore {
         const data = await res.json();
         if (data.success) {
           this.sslInfo = data;
-          this.notify();
+          this.notify({ type: "ssl-update" });
         }
       }
     } catch (e) {
