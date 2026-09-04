@@ -183,6 +183,47 @@
   box-shadow: 0 0 16px var(--brand-cyan-glow);
 }
 
+/* Quick Demo Suggestion Chips */
+.sample-try-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.sample-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.sample-chip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--brand-cyan);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sample-chip:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--brand-cyan);
+  color: var(--text-main);
+}
+
+.record-val-idle {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
 /* Record Type Selector Pills */
 .record-types-row {
   display: flex;

@@ -70,7 +70,7 @@ function mountGridStructure(mountEl) {
               <div class="resolver-card-bottom" id="bottom-${r.id}" title="Click to copy record value">
                 <div class="record-val-row">
                   <span class="record-val-text" id="val-${r.id}">
-                    <span class="skeleton-loading">Waiting to probe...</span>
+                    <span class="record-val-idle">Ready to probe</span>
                   </span>
                   <span class="record-ttl" id="ttl-${r.id}"></span>
                 </div>
@@ -141,6 +141,12 @@ export function updateResolverCard(resolverId) {
     if (store.isLoading) {
       card.classList.add("is-probing");
       if (valEl) valEl.innerHTML = `<span class="skeleton-loading">Querying node...</span>`;
+    } else {
+      card.classList.remove("is-probing", "is-matched", "is-differing", "is-error");
+      if (valEl) valEl.innerHTML = `<span class="record-val-idle">Ready to probe</span>`;
+      if (latencyEl) latencyEl.style.display = "none";
+      if (statusIconEl) statusIconEl.innerHTML = "";
+      if (ttlEl) ttlEl.textContent = "";
     }
     return;
   }

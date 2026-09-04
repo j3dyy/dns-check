@@ -2,6 +2,7 @@
  * DNS.usectl.com - Application Bootstrap & Coordinator (No-Jump Reactive Flow)
  */
 import { store } from "./state.js";
+import { isValidDomain } from "./utils/formatters.js";
 import { renderHeader } from "./components/header.js";
 import { renderSearchBar, updateSearchBarState } from "./components/search-bar.js";
 import { renderConsensusBar } from "./components/consensus-bar.js";
@@ -94,9 +95,13 @@ async function init() {
     }
   });
 
-  // Load resolvers dataset & trigger initial query
+  // Load resolvers dataset
   await store.loadResolvers();
-  store.queryAll();
+
+  // Only auto-probe if domain was explicitly supplied in the URL (e.g. ?d=usectl.com)
+  if (store.domain && isValidDomain(store.domain)) {
+    store.queryAll();
+  }
 
   // Handle ?inspect={resolverId} deep link to open drawer automatically
   const urlParams = new URLSearchParams(window.location.search);

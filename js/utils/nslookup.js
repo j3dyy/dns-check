@@ -28,6 +28,12 @@ export function generateNslookupOutput(domain, recordType, resolver, result) {
   ];
 
   if (!result) {
+    if (!domain) {
+      lines.push(`;; Resolver: ${resolver.name} (${serverIp}#53)`);
+      lines.push(`;; Status: Ready to query`);
+      lines.push(`;; Enter a domain above and press "Test DNS" (or press Enter)`);
+      return lines.join("\n");
+    }
     lines.push(`;; Querying ${resolver.name} (${serverIp})...`);
     return lines.join("\n");
   }

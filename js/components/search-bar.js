@@ -29,7 +29,7 @@ export function renderSearchBar(mountEl) {
               id="domain-input"
               class="domain-input"
               placeholder="Enter domain or IP (e.g. usectl.com, github.com)"
-              value="${store.domain}"
+              value="${store.domain || ""}"
               autocomplete="off"
               spellcheck="false"
               required
@@ -39,6 +39,15 @@ export function renderSearchBar(mountEl) {
               <span id="btn-query-text">${isQuerying ? "Probing..." : "Test DNS"}</span>
             </button>
           </form>
+
+          <!-- Quick Demo Suggestions Strip -->
+          <div class="sample-try-row">
+            <span class="sample-label">QUICK TEST:</span>
+            <button type="button" class="sample-chip" data-domain="usectl.com">usectl.com</button>
+            <button type="button" class="sample-chip" data-domain="github.com">github.com</button>
+            <button type="button" class="sample-chip" data-domain="cloudflare.com">cloudflare.com</button>
+            <button type="button" class="sample-chip" data-domain="google.com">google.com</button>
+          </div>
 
           <!-- Record Type Selector Row -->
           <div class="record-types-row" id="record-types-container">
@@ -84,11 +93,28 @@ export function renderSearchBar(mountEl) {
     }
   });
 
+  // Quick Demo Chips
+  mountEl.querySelectorAll(".sample-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const d = chip.getAttribute("data-domain");
+      const input = document.getElementById("domain-input");
+      if (input && d) {
+        input.value = d;
+        store.setDomain(d);
+        store.queryAll();
+      }
+    });
+  });
+
   // Record Type Switchers
   const pills = mountEl.querySelectorAll(".record-type-pill");
   pills.forEach((p) => {
     p.addEventListener("click", () => {
       const type = p.getAttribute("data-type");
+      const input = document.getElementById("domain-input");
+      if (input && input.value && input.value !== store.domain) {
+        store.setDomain(input.value);
+      }
       store.setRecordType(type);
     });
   });

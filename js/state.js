@@ -6,7 +6,7 @@ import { cleanDomain, isValidDomain } from "./utils/formatters.js";
 
 class DNSStore {
   constructor() {
-    this.domain = "usectl.com";
+    this.domain = "";
     this.recordType = "A";
     this.expectedValue = "";
     this.theme = localStorage.getItem("dns_theme") || "dark";
@@ -52,7 +52,11 @@ class DNSStore {
   setRecordType(type) {
     this.recordType = type.toUpperCase();
     this.updateUrlParams();
-    this.queryAll();
+    if (this.domain && isValidDomain(this.domain)) {
+      this.queryAll();
+    } else {
+      this.notify({ type: "record-type-changed" });
+    }
   }
 
   setExpectedValue(val) {
@@ -76,8 +80,18 @@ class DNSStore {
 
   updateUrlParams() {
     const url = new URL(window.location);
-    if (this.domain) url.searchParams.set("d", this.domain);
-    if (this.recordType) url.searchParams.set("t", this.recordType);
+    if (this.domain) {
+      url.searchParams.set("d", this.domain);
+    } else {
+      url.searchParams.delete("d");
+      url.searchParams.delete("q");
+    }
+    if (this.recordType && this.recordType !== "A") {
+      url.searchParams.set("t", this.recordType);
+    } else if (!this.domain) {
+      url.searchParams.delete("t");
+      url.searchParams.delete("type");
+    }
     if (this.viewMode && this.viewMode !== "grid") {
       url.searchParams.set("view", this.viewMode);
     } else {
