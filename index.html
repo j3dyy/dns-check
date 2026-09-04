@@ -6,10 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
   <!-- Primary Meta Tags -->
-  <title>DNS.usectl.com ⚡ Global Edge DNS &amp; SSL Propagation Radar</title>
-  <meta name="title" content="DNS.usectl.com ⚡ Global Edge DNS &amp; SSL Propagation Radar" />
-  <meta name="description" content="Check global DNS propagation across 20+ edge resolvers in real-time. Ad-free, sub-200ms latency, A/AAAA/CNAME/MX/TXT support, expected value diffing, and SSL certificate health by usectl." />
-  <meta name="keywords" content="dns propagation checker, global dns radar, doh client, whatsmydns alternative, ssl certificate checker, dnssec validator, dig online, usectl, devops tools" />
+  <title>DNS.usectl.com ⚡ Global DNS Radar &amp; nslookup Cross-Check</title>
+  <meta name="title" content="DNS.usectl.com ⚡ Global DNS Radar &amp; nslookup Cross-Check" />
+  <meta name="description" content="Real-time global DNS propagation radar &amp; nslookup cross-check across 16+ edge resolvers worldwide. Ad-free, sub-50ms latency, expected record diffing, and SSL certificate health by usectl." />
+  <meta name="keywords" content="dns propagation checker, nslookup online, dig online, global dns radar, doh client, whatsmydns alternative, ssl certificate checker, dnssec validator, edns0, dns troubleshooting, usectl, devops tools" />
   <meta name="author" content="usectl" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://dns.usectl.com/" />
@@ -18,14 +18,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dns.usectl.com/" />
   <meta property="og:site_name" content="DNS.usectl.com" />
-  <meta property="og:title" content="DNS.usectl.com ⚡ Global Edge DNS &amp; SSL Propagation Radar" />
-  <meta property="og:description" content="Ad-free, real-time global DNS propagation radar across 20+ edge resolvers with expected record diffing and SSL certificate monitoring." />
+  <meta property="og:title" content="DNS.usectl.com ⚡ Global DNS Radar &amp; nslookup Cross-Check" />
+  <meta property="og:description" content="Ad-free, real-time global DNS propagation radar &amp; nslookup cross-check across 16+ edge resolvers with expected record diffing and SSL certificate monitoring." />
   <meta property="og:image" content="https://dns.usectl.com/og-image.png" />
   <meta property="og:image:secure_url" content="https://dns.usectl.com/og-image.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="DNS.usectl.com - Global Edge DNS &amp; SSL Radar" />
+  <meta property="og:image:alt" content="DNS.usectl.com - Global Edge DNS Radar &amp; nslookup Cross-Check" />
   <meta property="og:locale" content="en_US" />
 
   <!-- Twitter / X Cards -->
@@ -33,38 +33,90 @@
   <meta name="twitter:url" content="https://dns.usectl.com/" />
   <meta name="twitter:site" content="@usectl" />
   <meta name="twitter:creator" content="@usectl" />
-  <meta name="twitter:title" content="DNS.usectl.com ⚡ Global Edge DNS &amp; SSL Propagation Radar" />
-  <meta name="twitter:description" content="Ad-free, real-time global DNS propagation radar across 20+ edge resolvers with expected record diffing and SSL certificate monitoring." />
+  <meta name="twitter:title" content="DNS.usectl.com ⚡ Global DNS Radar &amp; nslookup Cross-Check" />
+  <meta name="twitter:description" content="Ad-free, real-time global DNS propagation radar &amp; nslookup cross-check across 16+ edge resolvers with expected record diffing and SSL certificate monitoring." />
   <meta name="twitter:image" content="https://dns.usectl.com/og-image.png" />
-  <meta name="twitter:image:alt" content="DNS.usectl.com - Global Edge DNS &amp; SSL Radar" />
+  <meta name="twitter:image:alt" content="DNS.usectl.com - Global Edge DNS Radar &amp; nslookup Cross-Check" />
 
   <!-- Machine-Readable & AI Manifests -->
   <link rel="alternate" type="text/plain" href="https://dns.usectl.com/llms.txt" title="LLM Context Brief" />
   <link rel="alternate" type="text/markdown" href="https://dns.usectl.com/llms-full.txt" title="LLM Full Dataset" />
   <link rel="sitemap" type="application/xml" href="https://dns.usectl.com/sitemap.xml" />
 
-  <!-- Schema.org JSON-LD Structured Data -->
+  <!-- Schema.org JSON-LD Structured Data (WebApplication & FAQPage) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "DNS.usectl.com",
-    "alternateName": "DNS Propagation Radar",
-    "url": "https://dns.usectl.com/",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "All",
-    "description": "Zero-bloat global DNS propagation checker and SSL certificate health radar across 20+ edge resolvers worldwide.",
-    "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "creator": {
-      "@type": "Organization",
-      "name": "usectl",
-      "url": "https://usectl.com"
-    }
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://dns.usectl.com/#app",
+        "name": "DNS.usectl.com",
+        "alternateName": "Global DNS Propagation Radar & nslookup Cross-Check",
+        "url": "https://dns.usectl.com/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "description": "Ad-free global DNS propagation checker and live nslookup cross-check workstation across 16+ edge resolvers worldwide with SSL certificate health.",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "image": "https://dns.usectl.com/og-image.png",
+        "featureList": [
+          "Live nslookup and dig terminal workstation",
+          "16+ global edge resolvers across Anycast, NA, Europe, and APAC",
+          "UDP 53 raw socket engine with RFC 6891 EDNS0 support",
+          "Expected value diffing to detect stale cached records",
+          "Consensus clustering matrix to spot propagation latency splits",
+          "Zero-dependency SSL/TLS certificate health and expiration inspector"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "creator": {
+          "@type": "Organization",
+          "name": "usectl",
+          "url": "https://usectl.com"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://dns.usectl.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I check global DNS propagation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Enter your domain and record type in DNS.usectl.com. The tool queries 16+ global Anycast and regional edge resolvers simultaneously using high-speed UDP 53 sockets and DoH to verify resolution worldwide."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the nslookup Cross-Check view?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The nslookup Cross-Check view is a developer-first split workstation that displays authentic terminal-formatted nslookup and dig outputs side-by-side with automatic consensus clustering to identify diverging nodes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What DNS record types are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "DNS.usectl.com supports A, AAAA, CNAME, MX, TXT, NS, CAA, SOA, and PTR records with real-time expected value matching and remaining TTL counters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does SSL certificate inspection work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "DNS.usectl.com performs a direct TLS handshake with your domain to inspect certificate validity, remaining days before expiration, issuing CA authority, SAN domains, and cipher suites."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 
@@ -82,15 +134,71 @@
   <!-- Ambient Gradient Background -->
   <div class="bg-ambient-glow"></div>
 
-  <!-- Noscript Fallback for Non-JS Parsers -->
+  <!-- Semantic Noscript Fallback for Search Crawlers and Non-JS Clients -->
   <noscript>
-    <div style="max-width: 800px; margin: 40px auto; padding: 24px; font-family: sans-serif; line-height: 1.6;">
-      <h1>DNS.usectl.com ⚡ Global Edge DNS &amp; SSL Radar</h1>
+    <div style="max-width: 860px; margin: 40px auto; padding: 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #334155;">
+      <h1>DNS.usectl.com ⚡ Global Edge DNS Radar &amp; nslookup Cross-Check</h1>
       <p>
-        Real-time global DNS propagation radar across 20+ edge resolvers worldwide (Cloudflare, Google Public DNS, Quad9, OpenDNS, Control D, DNS.SB, and AdGuard).
-        Supports A, AAAA, CNAME, MX, TXT, NS, CAA, SOA, and PTR records with expected value diffing and SSL certificate health checks.
+        <strong>DNS.usectl.com</strong> is a zero-bloat, ad-free global DNS propagation verification engine and live nslookup cross-check workstation.
+        Verify DNS records across 16+ edge resolvers worldwide in sub-50ms latency.
       </p>
-      <p>Part of the <a href="https://usectl.com">usectl.com</a> developer infrastructure suite.</p>
+
+      <h2>Supported DNS Record Types</h2>
+      <ul>
+        <li><strong>A</strong>: IPv4 host address mapping</li>
+        <li><strong>AAAA</strong>: IPv6 128-bit address mapping</li>
+        <li><strong>CNAME</strong>: Canonical name alias redirection</li>
+        <li><strong>MX</strong>: Mail exchange server routing with priority weights</li>
+        <li><strong>TXT</strong>: SPF, DKIM, DMARC validation, and domain verification tokens</li>
+        <li><strong>NS</strong>: Authoritative nameserver delegation</li>
+        <li><strong>CAA</strong>: Certificate Authority Authorization policy flags</li>
+        <li><strong>SOA</strong>: Zone administrative metadata, serial numbers, and expiry timers</li>
+        <li><strong>PTR</strong>: Reverse DNS in-addr.arpa lookup</li>
+      </ul>
+
+      <h2>Global Edge Resolvers Monitored in Real-Time</h2>
+      <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+        <thead>
+          <tr style="background: #f1f5f9;">
+            <th>Resolver</th>
+            <th>IP Address</th>
+            <th>Location</th>
+            <th>Protocol</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Cloudflare</td><td>1.1.1.1</td><td>Global Anycast (300+ PoPs)</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Google Public DNS</td><td>8.8.8.8</td><td>Global Anycast</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Quad9</td><td>9.9.9.9</td><td>Global Anycast (Zurich HQ)</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>OpenDNS (Cisco)</td><td>208.67.222.222</td><td>San Jose, CA</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Control D</td><td>76.76.2.0</td><td>Ashburn, VA</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>CIRA Canadian Shield</td><td>149.112.121.10</td><td>Toronto, Canada</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>DNS.SB</td><td>185.222.222.222</td><td>Frankfurt, Germany</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>CleanBrowsing</td><td>185.228.168.9</td><td>Vienna, Austria</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>AdGuard DNS</td><td>94.140.14.14</td><td>Amsterdam, Netherlands</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Hurricane Electric</td><td>74.82.42.42</td><td>Frankfurt, Germany</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>AliDNS</td><td>223.5.5.5</td><td>Hangzhou, China</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>DNS.SB (Singapore)</td><td>185.222.222.222</td><td>Singapore</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Control D (Tokyo)</td><td>76.76.2.0</td><td>Tokyo, Japan</td><td>UDP 53 / DoH</td></tr>
+          <tr><td>Control D (Sydney)</td><td>76.76.2.0</td><td>Sydney, Australia</td><td>UDP 53 / DoH</td></tr>
+        </tbody>
+      </table>
+
+      <h2>CLI nslookup &amp; dig Cheat Sheet</h2>
+      <pre><code># Query A record with nslookup
+nslookup -type=A usectl.com 1.1.1.1
+
+# Query MX records via Google
+nslookup -type=MX usectl.com 8.8.8.8
+
+# Query TXT records with dig
+dig +short TXT usectl.com @1.1.1.1</code></pre>
+
+      <p>
+        Machine documentation: <a href="https://dns.usectl.com/llms.txt">llms.txt</a> &bull;
+        Full Reference: <a href="https://dns.usectl.com/llms-full.txt">llms-full.txt</a> &bull;
+        Part of the <a href="https://usectl.com">usectl.com</a> developer infrastructure suite.
+      </p>
     </div>
   </noscript>
 

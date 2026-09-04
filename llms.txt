@@ -1,40 +1,43 @@
 # DNS.usectl.com
 
-> DNS.usectl.com is a zero-bloat, ad-free global DNS propagation checker and SSL certificate radar for developers, DevOps, and cloud engineers.
+> DNS.usectl.com is a zero-bloat, ad-free global DNS propagation radar and live nslookup cross-check workstation for developers, DevOps, and cloud engineers.
 > Part of the usectl.com infrastructure suite.
 
 ## Quick Links
-- Canonical Website: https://dns.usectl.com
-- Full Documentation: https://dns.usectl.com/llms-full.txt
-- Resolver Dataset: https://dns.usectl.com/data/resolvers.json
-- Open Graph Preview: https://dns.usectl.com/og-image.png
-- Parent Ecosystem: https://usectl.com
+- Canonical Website: https://dns.usectl.com/
+- Full Technical Specification: https://dns.usectl.com/llms-full.txt
+- Resolver Dataset (JSON): https://dns.usectl.com/data/resolvers.json
+- Open Graph / Social Card: https://dns.usectl.com/og-image.png
+- GitHub Source Repository: https://github.com/j3dyy/dns-check
+- Ecosystem Root: https://usectl.com/
 
-## Supported Record Types
-- `A`: IPv4 host addresses
-- `AAAA`: IPv6 host addresses
-- `CNAME`: Canonical aliases
-- `MX`: Mail exchange hosts with priority rankings
-- `TXT`: SPF, DKIM, DMARC, and domain ownership tokens
-- `NS`: Authoritative nameservers
-- `CAA`: Certificate Authority Authorization rules
-- `SOA`: Start of Authority zones & serial numbers
-- `PTR`: Reverse DNS pointer records
+## URL Parameters & Deep Linking
+- `https://dns.usectl.com/?d={domain}`: Preset domain query (e.g. `usectl.com`, `github.com`)
+- `https://dns.usectl.com/?d={domain}&t={type}`: Query specific record type (`A`, `AAAA`, `CNAME`, `MX`, `TXT`, `NS`, `CAA`, `SOA`, `PTR`)
+- `https://dns.usectl.com/?view=nslookup`: Open directly into the split-screen nslookup Cross-Check terminal workstation
+- `https://dns.usectl.com/?inspect={resolverId}`: Automatically open the Slide-Over nslookup Overlay Drawer for a specific node (e.g. `cloudflare`, `google`, `quad9`)
 
-## Global Resolvers Queried in Parallel
-- Cloudflare Anycast (1.1.1.1)
-- Google Public DNS (8.8.8.8)
-- Quad9 Anycast (9.9.9.9)
-- OpenDNS / Cisco (208.67.222.222)
-- Control D (US, UK, Germany, Tokyo, Sydney, São Paulo, Johannesburg)
-- DNS.SB (Frankfurt, Singapore)
-- AdGuard DNS (Amsterdam, VA)
-- CIRA Canadian Shield (Toronto)
-- AliDNS (Hangzhou)
-- Mullvad (Stockholm)
+## Supported DNS Record Types
+- `A` (1): IPv4 32-bit host addresses
+- `AAAA` (28): IPv6 128-bit host addresses
+- `CNAME` (5): Canonical name aliases
+- `MX` (15): Mail exchange hosts with preference weights
+- `TXT` (16): SPF, DKIM, DMARC, and domain verification tokens
+- `NS` (2): Authoritative nameservers
+- `CAA` (257): Certificate Authority Authorization policies
+- `SOA` (6): Start of Authority zone metadata & serial timers
+- `PTR` (12): Reverse DNS pointer mapping
 
-## Key Technical Features
-- Sub-200ms latency via concurrent client-side DoH (`application/dns-json`).
-- Expected Value Diff Matcher: Highlights nodes serving stale cached records with remaining TTL.
-- Zero-dependency SSL/TLS Inspector: Certificate expiration countdown, issuer, cipher suite, and TLS version.
-- 1-click terminal commands: Instant `dig` and `nslookup` command generator.
+## Monitored Global Edge Resolvers
+- **Global Anycast**: Cloudflare (1.1.1.1), Google Public DNS (8.8.8.8), Quad9 (9.9.9.9)
+- **North America**: OpenDNS / Cisco (208.67.222.222), Control D US East (76.76.2.0), CIRA Canadian Shield (149.112.121.10)
+- **Europe**: DNS.SB Frankfurt (185.222.222.222), CleanBrowsing Vienna (185.228.168.9), AdGuard Amsterdam (94.140.14.14), Hurricane Electric Frankfurt (74.82.42.42)
+- **Asia & Pacific**: AliDNS Hangzhou (223.5.5.5), DNS.SB Singapore (185.222.222.222), Control D Tokyo (76.76.2.0), Control D Sydney (76.76.2.0)
+- **Latin America & Africa**: Control D São Paulo, Control D Johannesburg
+
+## Key Capabilities
+1. **nslookup Cross-Check Workstation**: Real-time terminal interface side-by-side with automatic consensus response clustering to instantly spot propagation splits.
+2. **Slide-Over Overlay Drawer**: Inspect authentic monospaced `nslookup` and `dig` outputs for any edge resolver with one click.
+3. **UDP Port 53 Raw Socket Engine**: High-speed RFC 6891 EDNS0 4096-byte UDP socket resolution (`/api/dns`) eliminating browser CORS constraints.
+4. **Expected Value Diffing**: Compares live returned records against expected values, highlighting stale caches with exact remaining TTL.
+5. **SSL/TLS Telemetry**: Automatic certificate handshake inspecting expiration countdown, issuing CA, SAN domains, and cipher suites (`/api/ssl`).

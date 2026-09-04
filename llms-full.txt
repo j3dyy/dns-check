@@ -1,54 +1,142 @@
-# DNS.usectl.com — Full Technical Reference
-> Source: https://dns.usectl.com | Parent: https://usectl.com
+# DNS.usectl.com — Full Technical Specification & Machine Reference
 
-## 1. Overview
-DNS.usectl.com replaces bloated, ad-ridden legacy DNS checkers (e.g. whatsmydns) with an instant, ad-free edge propagation radar.
+> Source: https://dns.usectl.com/ | Parent: https://usectl.com/ | GitHub: https://github.com/j3dyy/dns-check
 
-## 2. API & Resolver Endpoints
-| Resolver | Region | Location | Protocol | Format |
-| :--- | :--- | :--- | :--- | :--- |
-| Cloudflare | Anycast | 300+ PoPs | DoH | JSON (RFC 8427) |
-| Google Public DNS | Anycast | Global | DoH | Google JSON |
-| Quad9 | Anycast | Zurich HQ | DoH | JSON (RFC 8427) |
-| OpenDNS | North America | San Jose, CA | DoH | JSON (RFC 8427) |
-| Control D | North America | Ashburn, VA | DoH | JSON (RFC 8427) |
-| CIRA Canadian Shield | North America | Toronto, CA | DoH | JSON (RFC 8427) |
-| DNS.SB | Europe | Frankfurt, DE | DoH | JSON (RFC 8427) |
-| DNS0.EU | Europe | Paris, FR | DoH | JSON (RFC 8427) |
-| AdGuard | Europe | Amsterdam, NL | DoH | JSON (RFC 8427) |
-| Mullvad | Europe | Stockholm, SE | DoH | JSON (RFC 8427) |
-| AliDNS | Asia | Hangzhou, CN | DoH | Google JSON |
-| DNS.SB | Asia | Singapore, SG | DoH | JSON (RFC 8427) |
-| Control D | Asia | Tokyo, JP | DoH | JSON (RFC 8427) |
-| Control D | Oceania | Sydney, AU | DoH | JSON (RFC 8427) |
-| Control D | Latin America | São Paulo, BR | DoH | JSON (RFC 8427) |
-| Control D | Africa | Johannesburg, ZA | DoH | JSON (RFC 8427) |
+---
 
-## 3. SSL/TLS Inspection Endpoint
-Endpoint: `/api/ssl?domain={domain}`
-Returns:
-```json
-{
-  "success": true,
-  "domain": "usectl.com",
-  "valid": true,
-  "daysRemaining": 78,
-  "expiresAt": "2026-11-20 12:00 UTC",
-  "issuer": "Let's Encrypt",
-  "tlsVersion": "TLSv1.3",
-  "cipher": "TLS_AES_256_GCM_SHA384",
-  "sans": ["usectl.com", "*.usectl.com"]
-}
+## 1. Overview & Architectural Philosophy
+DNS.usectl.com is an ad-free, developer-first global DNS edge propagation radar and live nslookup cross-check workstation. It replaces legacy ad-cluttered lookup tools (e.g. whatsmydns) with an ultra-fast, zero-bloat diagnostic platform.
+
+Engineering teams use DNS.usectl.com during:
+- Domain migrations & DNS record updates (pointing A/CNAME to new cloud infrastructure).
+- Email authentication deployment (SPF, DKIM, DMARC TXT record verification).
+- SSL/TLS certificate renewals & DNS-01 ACME validation tracking.
+- Network routing and Anycast latency troubleshooting across global edge nodes.
+
+---
+
+## 2. API Endpoints
+
+### 2.1 Backend Raw UDP DNS Socket Endpoint
+- **Path**: `/api/dns`
+- **Method**: `GET`
+- **Query Parameters**:
+  - `server` (string): IPv4 address of the target resolver (e.g. `1.1.1.1`, `8.8.8.8`)
+  - `name` (string): Target domain to query (e.g. `usectl.com`)
+  - `type` (string): Record type (`A`, `AAAA`, `CNAME`, `MX`, `TXT`, `NS`, `CAA`, `SOA`, `PTR`)
+- **Protocol**: Direct UDP socket query on port 53 with RFC 6891 EDNS0 extension (4096-byte UDP buffer).
+- **Sample Request**:
+  ```
+  GET /api/dns?server=1.1.1.1&name=usectl.com&type=A
+  ```
+- **Sample Response**:
+  ```json
+  {
+    "success": true,
+    "status": "synced",
+    "records": [
+      { "value": "172.67.74.174", "ttl": 300, "type": "A" },
+      { "value": "104.26.2.182", "ttl": 300, "type": "A" },
+      { "value": "104.26.3.182", "ttl": 300, "type": "A" }
+    ],
+    "ttl": 300,
+    "latency": 8
+  }
+  ```
+
+### 2.2 SSL/TLS Edge Certificate Handshake Endpoint
+- **Path**: `/api/ssl`
+- **Method**: `GET`
+- **Query Parameters**:
+  - `domain` (string): Hostname to inspect via TLS handshake
+- **Sample Request**:
+  ```
+  GET /api/ssl?domain=usectl.com
+  ```
+- **Sample Response**:
+  ```json
+  {
+    "success": true,
+    "domain": "usectl.com",
+    "issuer": "Google Trust Services",
+    "expiresAt": "2026-11-05 18:32:04 UTC",
+    "daysRemaining": 62,
+    "tlsVersion": "TLSv1.3",
+    "cipher": "TLS_AES_256_GCM_SHA384",
+    "sans": ["usectl.com", "*.usectl.com"]
+  }
+  ```
+
+---
+
+## 3. Global Edge Resolvers Catalog
+
+| Resolver | Provider | Region | Location | IPv4 Address | Port | Transport |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cloudflare** | Cloudflare Inc. | Anycast | 300+ Cities Worldwide | `1.1.1.1` | 53 | UDP / DoH |
+| **Google Public DNS** | Google LLC | Anycast | Worldwide Anycast | `8.8.8.8` | 53 | UDP / DoH |
+| **Quad9** | Quad9 Foundation | Anycast | Zurich, Switzerland | `9.9.9.9` | 53 | UDP / DoH |
+| **OpenDNS** | Cisco Systems | North America | San Jose, California | `208.67.222.222` | 53 | UDP / DoH |
+| **Control D** | Control D Inc. | North America | Ashburn, Virginia | `76.76.2.0` | 53 | UDP / DoH |
+| **CIRA Canadian Shield** | CIRA | North America | Toronto, Canada | `149.112.121.10` | 53 | UDP / DoH |
+| **DNS.SB** | DNS.SB | Europe | Frankfurt, Germany | `185.222.222.222` | 53 | UDP / DoH |
+| **CleanBrowsing** | CleanBrowsing | Europe | Vienna, Austria | `185.228.168.9` | 53 | UDP / DoH |
+| **AdGuard DNS** | AdGuard | Europe | Amsterdam, Netherlands | `94.140.14.14` | 53 | UDP / DoH |
+| **Hurricane Electric** | Hurricane Electric | Europe | Frankfurt, Germany | `74.82.42.42` | 53 | UDP / DoH |
+| **AliDNS** | Alibaba Cloud | Asia | Hangzhou, China | `223.5.5.5` | 53 | UDP / DoH |
+| **DNS.SB** | DNS.SB | Asia | Singapore | `185.222.222.222` | 53 | UDP / DoH |
+| **Control D** | Control D Inc. | Asia | Tokyo, Japan | `76.76.2.0` | 53 | UDP / DoH |
+| **Control D** | Control D Inc. | Oceania | Sydney, Australia | `76.76.2.0` | 53 | UDP / DoH |
+| **Control D** | Control D Inc. | Latin America | São Paulo, Brazil | `76.76.2.0` | 53 | UDP / DoH |
+| **Control D** | Control D Inc. | Africa | Johannesburg, South Africa | `76.76.2.0` | 53 | UDP / DoH |
+
+---
+
+## 4. CLI Terminal Equivalents
+
+### 4.1 nslookup Commands
+```bash
+# Query A records via Cloudflare (1.1.1.1)
+nslookup -type=A usectl.com 1.1.1.1
+
+# Query MX records via Google Public DNS (8.8.8.8)
+nslookup -type=MX usectl.com 8.8.8.8
+
+# Query TXT records (SPF / DMARC) via Quad9 (9.9.9.9)
+nslookup -type=TXT usectl.com 9.9.9.9
+
+# Query CNAME records via OpenDNS
+nslookup -type=CNAME docs.usectl.com 208.67.222.222
 ```
 
-## 4. CLI Usage Examples
+### 4.2 dig Commands
 ```bash
-# Query A record via Cloudflare
+# Short A record query
 dig +short A usectl.com @1.1.1.1
 
-# Query TXT records via Google
-dig +short TXT usectl.com @8.8.8.8
+# Full query with answer section and response stats
+dig usectl.com A @1.1.1.1 +noall +answer +stats
 
-# DoH JSON query
-curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=usectl.com&type=A'
+# Query nameservers (NS)
+dig +short NS usectl.com @8.8.8.8
 ```
+
+### 4.3 curl DNS-over-HTTPS (DoH) Commands
+```bash
+# Cloudflare RFC 8427 DoH JSON
+curl -s -H 'accept: application/dns-json' \
+  'https://cloudflare-dns.com/dns-query?name=usectl.com&type=A'
+
+# Google Public DNS DoH JSON
+curl -s 'https://dns.google/resolve?name=usectl.com&type=A'
+```
+
+---
+
+## 5. UI Features & Diagnostic Tools
+
+1. **Stationary Geometry**: Cards are locked to exact 104px height, mounting the DOM tree once and executing surgical in-place text updates for zero layout shift during probing.
+2. **nslookup Cross-Check Workstation**: Split developer terminal view with interactive node selector and consensus clustering grouping resolvers by returned answers.
+3. **Slide-Over Overlay Drawer**: In-depth modal drawer featuring authentic terminal output and `< 1 / 16 >` navigation keys (<kbd>&larr;</kbd> <kbd>&rarr;</kbd>).
+4. **Expected Value Diffing**: Compares live returned records against expected values, highlighting stale caches in amber with remaining TTL counters.
+5. **Deep Linking**: Full URL parameter support for domain (`?d=`), record type (`?t=`), view mode (`?view=nslookup`), and node inspection (`?inspect=cloudflare`).

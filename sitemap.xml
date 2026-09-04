@@ -8,7 +8,8 @@
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://dns.usectl.com/og-image.png</image:loc>
-      <image:title>DNS.usectl.com - Global Edge DNS &amp; SSL Propagation Radar</image:title>
+      <image:title>DNS.usectl.com - Global Edge DNS Radar &amp; nslookup Cross-Check</image:title>
+      <image:caption>Real-time global DNS propagation radar across 16+ edge resolvers with live nslookup cross-check and SSL certificate monitoring.</image:caption>
     </image:image>
   </url>
   <url>
@@ -16,5 +17,11 @@
     <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dns.usectl.com/llms-full.txt</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

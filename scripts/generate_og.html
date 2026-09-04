@@ -2,40 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DNS.usectl.com OG Card</title>
+  <title>DNS.usectl.com - OpenGraph & Twitter Social Card</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       width: 1200px;
       height: 630px;
       overflow: hidden;
-      background: #060913;
+      background: #050813;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       color: #f8fafc;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 64px 72px;
+      padding: 48px 56px;
       position: relative;
     }
 
-    /* Ambient Glows */
+    /* Ambient Cyber Glows */
     .glow-cyan {
       position: absolute;
-      top: -100px;
-      right: -80px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0) 70%);
+      top: -120px;
+      right: 120px;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 70%);
       pointer-events: none;
     }
     .glow-emerald {
       position: absolute;
-      bottom: -120px;
-      left: 100px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%);
+      bottom: -140px;
+      left: 80px;
+      width: 580px;
+      height: 580px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0) 70%);
+      pointer-events: none;
+    }
+    .glow-indigo {
+      position: absolute;
+      bottom: -100px;
+      right: -80px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.18) 0%, rgba(129, 140, 248, 0) 70%);
       pointer-events: none;
     }
 
@@ -44,13 +53,13 @@
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 44px 44px;
       pointer-events: none;
     }
 
-    /* Header */
+    /* Top Brand Header */
     .header {
       display: flex;
       align-items: center;
@@ -60,10 +69,10 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
     .brand-title {
-      font-size: 44px;
+      font-size: 38px;
       font-weight: 800;
       letter-spacing: -0.03em;
       color: #ffffff;
@@ -78,70 +87,166 @@
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.35);
       color: #38bdf8;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 9999px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 0.02em;
     }
-    .ecosystem-tag {
-      font-size: 22px;
+    .domain-url {
+      font-size: 20px;
       font-weight: 700;
-      color: #64748b;
-      letter-spacing: -0.01em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #94a3b8;
     }
-    .ecosystem-tag span {
+    .domain-url span {
       color: #38bdf8;
     }
 
-    /* Hero */
-    .hero-content {
+    /* Main Content: Two Columns */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1.18fr 0.95fr;
+      gap: 36px;
+      align-items: center;
       z-index: 10;
-      margin-top: 10px;
+      margin: 12px 0;
+    }
+
+    /* Left Column */
+    .hero-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
     .headline {
-      font-size: 58px;
-      line-height: 1.12;
+      font-size: 46px;
+      line-height: 1.14;
       font-weight: 800;
       letter-spacing: -0.035em;
       color: #f1f5f9;
-      max-width: 980px;
     }
     .headline span {
-      background: linear-gradient(135deg, #38bdf8 0%, #10b981 100%);
+      background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .subhead {
-      margin-top: 16px;
-      font-size: 23px;
+      font-size: 18px;
       color: #94a3b8;
-      line-height: 1.4;
-      max-width: 920px;
+      line-height: 1.45;
+      max-width: 580px;
     }
 
-    /* Feature Pills */
-    .feature-strip {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 26px;
-      z-index: 10;
+    /* Feature Pills Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .pill {
+    .feat-pill {
       display: flex;
       align-items: center;
       gap: 8px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 18px;
-      border-radius: 12px;
-      font-size: 16px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
       font-weight: 600;
       color: #cbd5e1;
     }
-    .pill-icon {
+    .feat-icon {
       color: #38bdf8;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* Right Column: Terminal Window */
+    .terminal-mock {
+      background: #060913;
+      border: 1.5px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.75), 0 0 32px rgba(56, 189, 248, 0.15);
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .term-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0c1222;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 14px;
+    }
+    .term-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #10b981; }
+
+    .term-title {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .term-tab {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .term-body {
+      padding: 16px 18px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+    .term-cmd {
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .term-cmd span {
+      color: #f8fafc;
+      font-weight: 500;
+    }
+    .term-muted {
+      color: #64748b;
+    }
+    .term-key {
+      color: #818cf8;
+    }
+    .term-ans {
+      color: #34d399;
+      font-weight: 600;
+    }
+    .term-footer {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+    }
+    .term-badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #34d399;
+      font-weight: 700;
     }
 
     /* Footer */
@@ -150,40 +255,50 @@
       align-items: center;
       justify-content: space-between;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding-top: 24px;
+      padding-top: 18px;
       z-index: 10;
     }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
     .footer-label {
-      font-size: 16px;
+      font-size: 13.5px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       font-weight: 700;
       color: #64748b;
     }
-    .nodes-list {
+    .nodes-strip {
       display: flex;
-      gap: 12px;
+      gap: 8px;
     }
-    .node-chip {
+    .node-pill {
       background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
       font-weight: 600;
       color: #e2e8f0;
+    }
+    .footer-right {
+      font-size: 13px;
+      color: #64748b;
     }
   </style>
 </head>
 <body>
   <div class="glow-cyan"></div>
   <div class="glow-emerald"></div>
+  <div class="glow-indigo"></div>
   <div class="bg-grid"></div>
 
-  <!-- Header -->
+  <!-- Top Header -->
   <div class="header">
     <div class="brand">
-      <svg width="58" height="58" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="ogDnsBg" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#0f172a" />
@@ -194,7 +309,7 @@
             <stop offset="100%" stop-color="#0284c7" />
           </linearGradient>
           <linearGradient id="ogSweep" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4" />
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45" />
             <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
           </linearGradient>
         </defs>
@@ -218,40 +333,78 @@
       </div>
       <div class="brand-badge">⚡ Global Edge Radar</div>
     </div>
-    <div class="ecosystem-tag">
+    <div class="domain-url">
       <span>dns</span>.usectl.com
     </div>
   </div>
 
-  <!-- Hero Content -->
-  <div class="hero-content">
-    <h1 class="headline">
-      Zero-Bloat <span>Global DNS &amp; SSL</span> Propagation Radar.
-    </h1>
-    <p class="subhead">
-      Check DNS propagation across 20+ global edge resolvers in parallel. Ad-free, sub-200ms latency, expected record diffing, and SSL certificate expiration monitoring.
-    </p>
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Left Column: Title & Feature Grid -->
+    <div class="hero-col">
+      <h1 class="headline">
+        Global DNS Radar &amp; <span>nslookup Cross-Check</span>.
+      </h1>
+      <p class="subhead">
+        Real-time propagation radar across 16+ global edge resolvers. Ad-free, sub-50ms latency, expected record diffing, and SSL certificate telemetry.
+      </p>
 
-    <!-- Feature Strip -->
-    <div class="feature-strip">
-      <div class="pill"><span class="pill-icon">✓</span> 20+ Global Anycast Resolvers</div>
-      <div class="pill"><span class="pill-icon">⚡</span> A, AAAA, CNAME, MX, TXT, NS</div>
-      <div class="pill"><span class="pill-icon">🎯</span> Expected Value Diff Matcher</div>
-      <div class="pill"><span class="pill-icon">🔒</span> SSL/TLS Expiration Inspector</div>
-      <div class="pill"><span class="pill-icon">💻</span> 1-Click Terminal Dig Snippets</div>
+      <div class="features-grid">
+        <div class="feat-pill"><span class="feat-icon">&gt;_</span> nslookup &amp; dig Terminal</div>
+        <div class="feat-pill"><span class="feat-icon">🌐</span> 16 Global Edge Resolvers</div>
+        <div class="feat-pill"><span class="feat-icon">⚡</span> UDP 53 Socket (EDNS0)</div>
+        <div class="feat-pill"><span class="feat-icon">🎯</span> Expected Record Diffing</div>
+        <div class="feat-pill"><span class="feat-icon">🔒</span> SSL Certificate Expiration</div>
+        <div class="feat-pill"><span class="feat-icon">📊</span> Consensus Cluster Matrix</div>
+      </div>
+    </div>
+
+    <!-- Right Column: Terminal Mockup -->
+    <div class="terminal-mock">
+      <div class="term-titlebar">
+        <div class="term-dots">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+        </div>
+        <span class="term-title">nslookup — Cloudflare (1.1.1.1#53)</span>
+        <span class="term-tab">UDP 53</span>
+      </div>
+
+      <div class="term-body">
+        <div class="term-cmd">$ <span>nslookup -type=A usectl.com 1.1.1.1</span></div>
+        <div class="term-muted">Server:   1.1.1.1</div>
+        <div class="term-muted">Address:  1.1.1.1#53</div>
+        <br/>
+        <div class="term-key">Non-authoritative answer:</div>
+        <div>Name:    usectl.com</div>
+        <div class="term-ans">Address: 104.26.2.182</div>
+        <div class="term-ans">Address: 172.67.74.174</div>
+        <div class="term-ans">Address: 104.26.3.182</div>
+
+        <div class="term-footer">
+          <span class="term-badge-live">● 100% Synced (16/16)</span>
+          <span style="color: #38bdf8;">Query: 4ms &bull; TTL: 300s</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- Bottom Footer -->
   <div class="footer">
-    <span class="footer-label">Powered by usectl.com</span>
-    <div class="nodes-list">
-      <div class="node-chip">Cloudflare (1.1.1.1)</div>
-      <div class="node-chip">Google (8.8.8.8)</div>
-      <div class="node-chip">Quad9 (9.9.9.9)</div>
-      <div class="node-chip">OpenDNS</div>
-      <div class="node-chip">Control D</div>
-      <div class="node-chip">AdGuard</div>
+    <div class="footer-left">
+      <span class="footer-label">Verified Anycast Nodes:</span>
+      <div class="nodes-strip">
+        <div class="node-pill">Cloudflare (1.1.1.1)</div>
+        <div class="node-pill">Google (8.8.8.8)</div>
+        <div class="node-pill">Quad9 (9.9.9.9)</div>
+        <div class="node-pill">OpenDNS</div>
+        <div class="node-pill">Control D</div>
+        <div class="node-pill">DNS.SB</div>
+      </div>
+    </div>
+    <div class="footer-right">
+      A product of <strong>usectl.com</strong>
     </div>
   </div>
 </body>
