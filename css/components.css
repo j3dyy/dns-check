@@ -1840,4 +1840,436 @@
   animation: shimmer 1.5s infinite;
 }
 
+/* ==========================================================================
+   Consensus Bar: DNSSEC, ASN Pill & HTTP Health Badges
+   ========================================================================== */
+.consensus-val-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dominant-val-text {
+  color: var(--brand-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.asn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--brand-cyan);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.asn-pill-tiny {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: var(--brand-cyan);
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+.asn-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--brand-cyan);
+}
+
+.dnssec-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.dnssec-pill.valid {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--brand-emerald);
+}
+
+.dnssec-pill.unsigned {
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--text-dim);
+}
+
+.http-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.http-pill.ok {
+  background: rgba(16, 185, 129, 0.09);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--brand-emerald);
+}
+
+.http-pill.warn {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--brand-amber);
+}
+
+.http-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ==========================================================================
+   Zone Overview: DMARC Inspector & Export Buttons
+   ========================================================================== */
+.dmarc-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.dmarc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.dmarc-pill.dmarc-reject {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--brand-emerald);
+}
+
+.dmarc-pill.dmarc-quarantine {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--brand-amber);
+}
+
+.dmarc-pill.dmarc-none {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: var(--text-dim);
+}
+
+.dmarc-pill.dmarc-missing {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.28);
+  color: var(--brand-rose);
+}
+
+.dmarc-meta-text {
+  font-size: 0.74rem;
+  color: var(--text-dim);
+}
+
+.btn-zone-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-zone-export:hover {
+  border-color: var(--brand-cyan);
+  color: var(--brand-cyan);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+/* ==========================================================================
+   Recent Searches History Strip
+   ========================================================================== */
+.recent-history-row {
+  margin-bottom: 6px !important;
+}
+
+.recent-chips-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.recent-chip-item {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease;
+}
+
+.recent-chip-item:hover {
+  border-color: var(--border-color);
+}
+
+.recent-domain-chip {
+  background: transparent !important;
+  border: none !important;
+  padding: 3px 6px 3px 8px !important;
+  font-size: 0.75rem !important;
+  color: var(--text-main) !important;
+}
+
+.recent-domain-chip:hover {
+  color: var(--brand-cyan) !important;
+}
+
+.recent-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 3px 6px 3px 2px;
+  cursor: pointer;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  transition: color 0.15s ease;
+}
+
+.recent-remove-btn:hover {
+  color: var(--brand-rose);
+}
+
+/* ==========================================================================
+   Export Modal Dialog (BIND Zone & JSON)
+   ========================================================================== */
+.export-modal-card {
+  max-width: 740px !important;
+  width: 92% !important;
+}
+
+.export-format-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+  margin-top: 14px;
+}
+
+.export-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.export-tab:hover {
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.export-tab.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--brand-cyan);
+  color: var(--brand-cyan);
+}
+
+.export-code-preview-wrap {
+  margin-top: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.export-code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.code-filename-label {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--brand-cyan);
+  font-weight: 600;
+}
+
+.export-code-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-copy-code, .btn-download-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-code:hover, .btn-download-code:hover {
+  border-color: var(--brand-cyan);
+  color: var(--brand-cyan);
+}
+
+.btn-copy-code.copied {
+  border-color: var(--brand-emerald);
+  color: var(--brand-emerald);
+}
+
+.export-pre {
+  margin: 0;
+  padding: 14px;
+  max-height: 380px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  white-space: pre;
+}
+
+.btn-done {
+  padding: 6px 18px;
+  background: var(--brand-cyan);
+  color: #060912;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-done:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Global Floating Toast Notifications
+   ========================================================================== */
+.dns-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.dns-toast-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 15px;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(56, 189, 248, 0.2);
+  color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.dns-toast-item.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.dns-toast-item.success {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.dns-toast-item.error {
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(244, 63, 94, 0.2);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--brand-cyan);
+}
+
+.dns-toast-item.success .toast-dot {
+  background-color: var(--brand-emerald);
+}
+
+.dns-toast-item.error .toast-dot {
+  background-color: var(--brand-rose);
+}
+
+
 

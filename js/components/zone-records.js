@@ -84,6 +84,12 @@ export function renderZoneRecords(mountEl) {
             </div>
 
             <div class="zone-header-actions">
+              <button type="button" class="btn-zone-export" id="btn-export-bind" title="Export as standard RFC 1035 BIND Zone File">
+                ${icons.fileText(12)} <span>BIND Zone</span>
+              </button>
+              <button type="button" class="btn-zone-export" id="btn-export-json" title="Export DNS Records as JSON">
+                ${icons.download(12)} <span>JSON</span>
+              </button>
               <span class="zone-count-badge">
                 <span class="count-num">${totalCount}</span> Records Discovered
               </span>
@@ -97,7 +103,7 @@ export function renderZoneRecords(mountEl) {
           <div class="zone-card-body ${isCollapsed ? "is-hidden" : ""}">
             <div class="zone-records-grid">
 
-              <!-- 1. Mail Exchange (MX) -->
+              <!-- 1. Mail Exchange (MX) & DMARC -->
               <div class="zone-group-card">
                 <div class="zone-group-top">
                   <div class="zone-group-title">
@@ -110,6 +116,15 @@ export function renderZoneRecords(mountEl) {
                   </button>
                 </div>
                 <div class="zone-group-content">
+                  ${zone.dmarc ? `
+                    <div class="dmarc-badge-row">
+                      <span class="dmarc-pill ${zone.dmarc.hasDmarc ? (zone.dmarc.policy === 'reject' ? 'dmarc-reject' : zone.dmarc.policy === 'quarantine' ? 'dmarc-quarantine' : 'dmarc-none') : 'dmarc-missing'}">
+                        ${icons.shield(11)}
+                        <span>${zone.dmarc.hasDmarc ? `DMARC: p=${zone.dmarc.policy?.toUpperCase() || 'NONE'}` : 'No DMARC'}</span>
+                      </span>
+                      <span class="dmarc-meta-text">${zone.dmarc.hasDmarc ? (zone.dmarc.policy === 'reject' ? 'Spoofed emails rejected' : zone.dmarc.policy === 'quarantine' ? 'Spoofed emails quarantined' : 'Monitoring only') : 'Spoofing risk'}</span>
+                    </div>
+                  ` : ""}
                   ${mxRecs.length > 0
                     ? mxRecs.map((r) => {
                         const parts = r.value.split(" ");
@@ -203,16 +218,20 @@ export function renderZoneRecords(mountEl) {
                 <div class="zone-group-content">
                   ${aRecs.length > 0 || aaaaRecs.length > 0
                     ? `
-                        ${aRecs.map((r) => `
-                          <div class="zone-record-row">
-                            <span class="ip-type-tag ipv4">IPv4</span>
-                            <span class="rec-val-mono ip-highlight" title="${r.value}">${r.value}</span>
-                            <span class="zone-ttl">${r.ttl ? `TTL ${formatTTL(r.ttl)}` : ""}</span>
-                            <button type="button" class="btn-copy-tiny" data-copy="${r.value}" title="Copy IPv4">
-                              ${icons.copy(12)}
-                            </button>
-                          </div>
-                        `).join("")}
+                        ${aRecs.map((r) => {
+                          const asn = store.asnInfo[r.value];
+                          return `
+                            <div class="zone-record-row">
+                              <span class="ip-type-tag ipv4">IPv4</span>
+                              <span class="rec-val-mono ip-highlight" title="${r.value}">${r.value}</span>
+                              ${asn && asn.asn ? `<span class="asn-pill-tiny" title="${asn.asn}">${asn.org || asn.asn}</span>` : ""}
+                              <span class="zone-ttl">${r.ttl ? `TTL ${formatTTL(r.ttl)}` : ""}</span>
+                              <button type="button" class="btn-copy-tiny" data-copy="${r.value}" title="Copy IPv4">
+                                ${icons.copy(12)}
+                              </button>
+                            </div>
+                          `;
+                        }).join("")}
                         ${aaaaRecs.map((r) => `
                           <div class="zone-record-row">
                             <span class="ip-type-tag ipv6">IPv6</span>
@@ -362,5 +381,16 @@ export function renderZoneRecords(mountEl) {
         }
       }
     });
+  });
+
+  // 4. Export BIND and JSON triggers
+  mountEl.querySelector("#btn-export-bind")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    window.dispatchEvent(new CustomEvent("open-export-modal", { detail: { format: "bind" } }));
+  });
+
+  mountEl.querySelector("#btn-export-json")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    window.dispatchEvent(new CustomEvent("open-export-modal", { detail: { format: "json" } }));
   });
 }

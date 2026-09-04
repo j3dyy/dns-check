@@ -16,6 +16,8 @@ import ssl
 import struct
 import time
 import concurrent.futures
+import urllib.request
+import urllib.error
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timezone
 
@@ -83,8 +85,8 @@ def query_dns_udp(server_ip, domain, qtype_str="A", timeout=3.0):
     # QTYPE + QCLASS (IN=1)
     packet += struct.pack(">HH", qtype, 1)
 
-    # EDNS0 OPT RR (RFC 6891): Name=0, Type=41, UDP payload=4096, Extended RCODE=0, EDNS=0, Z=0, RDLEN=0
-    packet += struct.pack(">BHHII", 0, 41, 4096, 0, 0)
+    # EDNS0 OPT RR (RFC 6891 + RFC 3225): Name=0, Type=41, UDP payload=4096, Extended RCODE=0, DO=1 (DNSSEC OK), Z=0, RDLEN=0
+    packet += struct.pack(">BHHII", 0, 41, 4096, 0x8000, 0)
 
     start_time = time.perf_counter()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -99,9 +101,10 @@ def query_dns_udp(server_ip, domain, qtype_str="A", timeout=3.0):
         flags = struct.unpack(">H", data[2:4])[0]
         rcode = flags & 0x000F
         ancount = struct.unpack(">H", data[6:8])[0]
+        ad_flag = bool(flags & 0x0020)  # RFC 2535 / 4035 Authenticated Data
 
         if rcode == 3:
-            return {"success": True, "status": "nxdomain", "records": [], "ttl": None, "latency": latency}
+            return {"success": True, "status": "nxdomain", "records": [], "ttl": None, "latency": latency, "dnssec": ad_flag}
 
         # Skip question section
         _, offset = parse_name(data, 12)
@@ -165,7 +168,8 @@ def query_dns_udp(server_ip, domain, qtype_str="A", timeout=3.0):
             "status": "synced" if records else "empty",
             "records": records,
             "ttl": min_ttl,
-            "latency": latency
+            "latency": latency,
+            "dnssec": ad_flag
         }
     except socket.timeout:
         return {"success": False, "status": "error", "error": "Query timed out (>3s)", "records": [], "latency": 3000}
@@ -230,18 +234,205 @@ def get_ssl_cert_info(domain):
         }
 
 
+KNOWN_ASN_PREFIXES = [
+    # Cloudflare
+    ("104.16.", "Cloudflare", "AS13335"),
+    ("104.17.", "Cloudflare", "AS13335"),
+    ("104.18.", "Cloudflare", "AS13335"),
+    ("104.19.", "Cloudflare", "AS13335"),
+    ("104.20.", "Cloudflare", "AS13335"),
+    ("104.21.", "Cloudflare", "AS13335"),
+    ("104.22.", "Cloudflare", "AS13335"),
+    ("104.23.", "Cloudflare", "AS13335"),
+    ("104.24.", "Cloudflare", "AS13335"),
+    ("104.25.", "Cloudflare", "AS13335"),
+    ("104.26.", "Cloudflare", "AS13335"),
+    ("104.27.", "Cloudflare", "AS13335"),
+    ("104.28.", "Cloudflare", "AS13335"),
+    ("172.64.", "Cloudflare", "AS13335"),
+    ("172.65.", "Cloudflare", "AS13335"),
+    ("172.66.", "Cloudflare", "AS13335"),
+    ("172.67.", "Cloudflare", "AS13335"),
+    ("162.158.", "Cloudflare", "AS13335"),
+    ("162.159.", "Cloudflare", "AS13335"),
+    ("1.1.1.", "Cloudflare", "AS13335"),
+    ("1.0.0.", "Cloudflare", "AS13335"),
+    # Vercel
+    ("76.76.21.", "Vercel", "AS396982"),
+    ("76.223.126.", "Vercel", "AS396982"),
+    # GitHub / Microsoft
+    ("140.82.", "GitHub", "AS36459"),
+    ("185.199.", "GitHub Pages", "AS36459"),
+    ("20.", "Microsoft Azure", "AS8075"),
+    ("51.", "Microsoft Azure", "AS8075"),
+    # Google / Google Cloud
+    ("8.8.8.", "Google Public DNS", "AS15169"),
+    ("8.8.4.", "Google Public DNS", "AS15169"),
+    ("142.250.", "Google", "AS15169"),
+    ("172.217.", "Google", "AS15169"),
+    ("34.", "Google Cloud", "AS15169"),
+    ("35.", "Google Cloud", "AS15169"),
+    # Amazon AWS
+    ("13.224.", "Amazon CloudFront", "AS16509"),
+    ("13.225.", "Amazon CloudFront", "AS16509"),
+    ("13.32.", "Amazon CloudFront", "AS16509"),
+    ("13.33.", "Amazon CloudFront", "AS16509"),
+    ("13.35.", "Amazon CloudFront", "AS16509"),
+    ("52.84.", "Amazon CloudFront", "AS16509"),
+    ("54.230.", "Amazon CloudFront", "AS16509"),
+    ("99.84.", "Amazon CloudFront", "AS16509"),
+    ("143.204.", "Amazon CloudFront", "AS16509"),
+    ("18.", "Amazon AWS", "AS16509"),
+    ("52.", "Amazon AWS", "AS16509"),
+    ("54.", "Amazon AWS", "AS16509"),
+    # Fastly
+    ("151.101.", "Fastly", "AS54113"),
+    ("199.232.", "Fastly", "AS54113"),
+    # Akamai
+    ("23.", "Akamai", "AS20940"),
+    ("104.64.", "Akamai", "AS20940"),
+    # DigitalOcean
+    ("138.68.", "DigitalOcean", "AS14061"),
+    ("159.203.", "DigitalOcean", "AS14061"),
+    ("165.227.", "DigitalOcean", "AS14061"),
+    ("167.99.", "DigitalOcean", "AS14061"),
+    # Hetzner
+    ("159.69.", "Hetzner", "AS24940"),
+    ("168.119.", "Hetzner", "AS24940"),
+    ("65.108.", "Hetzner", "AS24940"),
+    ("88.198.", "Hetzner", "AS24940"),
+]
+
+
+def get_ip_asn_info(ip):
+    ip_clean = ip.strip()
+    # 1. Fast path prefix match
+    for prefix, org, asn in KNOWN_ASN_PREFIXES:
+        if ip_clean.startswith(prefix):
+            return {
+                "success": True,
+                "ip": ip_clean,
+                "asn": asn,
+                "org": org,
+                "source": "fastpath"
+            }
+
+    # 2. DNS Cymru lookup for any global IP: <reversed-ip>.origin.asn.cymru.com
+    try:
+        parts = ip_clean.split(".")
+        if len(parts) == 4:
+            rev_ip = f"{parts[3]}.{parts[2]}.{parts[1]}.{parts[0]}.origin.asn.cymru.com"
+            res = query_dns_udp("1.1.1.1", rev_ip, "TXT", timeout=1.5)
+            if res.get("success") and res.get("records"):
+                txt_val = res["records"][0]["value"].strip('"')
+                cymru_parts = [p.strip() for p in txt_val.split("|")]
+                if cymru_parts:
+                    asn_num = cymru_parts[0]
+                    name_res = query_dns_udp("1.1.1.1", f"AS{asn_num}.asn.cymru.com", "TXT", timeout=1.5)
+                    org_name = f"AS{asn_num}"
+                    if name_res.get("success") and name_res.get("records"):
+                        name_val = name_res["records"][0]["value"].strip('"')
+                        name_parts = [p.strip() for p in name_val.split("|")]
+                        if len(name_parts) >= 5:
+                            org_name = name_parts[4]
+                    return {
+                        "success": True,
+                        "ip": ip_clean,
+                        "asn": f"AS{asn_num}",
+                        "org": org_name,
+                        "source": "cymru"
+                    }
+    except Exception:
+        pass
+
+    return {
+        "success": False,
+        "ip": ip_clean,
+        "asn": "—",
+        "org": "Cloud Provider",
+        "source": "none"
+    }
+
+
+def check_http_health(domain):
+    clean = domain.strip().lower().split("/")[0].split(":")[0]
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; usectl-dns/1.0; +https://dns.usectl.com)"}
+    ctx = ssl.create_default_context()
+
+    # Try HTTPS first
+    url = f"https://{clean}"
+    start_time = time.perf_counter()
+    try:
+        req = urllib.request.Request(url, headers=headers, method="HEAD")
+        with urllib.request.urlopen(req, timeout=2.5, context=ctx) as resp:
+            ttfb = round((time.perf_counter() - start_time) * 1000)
+            status_code = resp.status
+            server_hdr = resp.headers.get("Server", "Unknown")
+            return {
+                "success": True,
+                "status": status_code,
+                "statusText": "200 OK" if status_code == 200 else f"HTTP {status_code}",
+                "server": server_hdr,
+                "ttfb": ttfb,
+                "url": resp.geturl(),
+                "isHttps": True
+            }
+    except urllib.error.HTTPError as e:
+        ttfb = round((time.perf_counter() - start_time) * 1000)
+        return {
+            "success": True,
+            "status": e.code,
+            "statusText": f"HTTP {e.code}",
+            "server": e.headers.get("Server", "Unknown"),
+            "ttfb": ttfb,
+            "url": url,
+            "isHttps": True
+        }
+    except Exception:
+        # Fallback to HTTP port 80
+        try:
+            http_url = f"http://{clean}"
+            start_time = time.perf_counter()
+            req = urllib.request.Request(http_url, headers=headers, method="HEAD")
+            with urllib.request.urlopen(req, timeout=2.5) as resp:
+                ttfb = round((time.perf_counter() - start_time) * 1000)
+                return {
+                    "success": True,
+                    "status": resp.status,
+                    "statusText": "200 OK" if resp.status == 200 else f"HTTP {resp.status}",
+                    "server": resp.headers.get("Server", "Unknown"),
+                    "ttfb": ttfb,
+                    "url": resp.geturl(),
+                    "isHttps": False
+                }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "status": None
+            }
+
+
 def get_all_domain_records(domain, server_ip="1.1.1.1"):
+    clean_domain = domain.strip().strip(".")
     types_to_query = ["A", "AAAA", "CNAME", "MX", "NS", "TXT", "CAA", "SOA"]
     results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+    is_dnssec = False
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         future_to_type = {
-            executor.submit(query_dns_udp, server_ip, domain, t, 3.0): t
+            executor.submit(query_dns_udp, server_ip, clean_domain, t, 3.0): t
             for t in types_to_query
         }
+        # Also query _dmarc in parallel
+        dmarc_future = executor.submit(query_dns_udp, server_ip, f"_dmarc.{clean_domain}", "TXT", 3.0)
+
         for future in concurrent.futures.as_completed(future_to_type):
             t = future_to_type[future]
             try:
                 res = future.result()
+                if res.get("dnssec"):
+                    is_dnssec = True
                 if res.get("success") and res.get("records"):
                     results[t] = res["records"]
                 else:
@@ -249,11 +440,32 @@ def get_all_domain_records(domain, server_ip="1.1.1.1"):
             except Exception:
                 results[t] = []
 
+        # Process DMARC
+        dmarc_data = {"hasDmarc": False, "policy": "none", "records": [], "rua": ""}
+        try:
+            dmarc_res = dmarc_future.result()
+            if dmarc_res.get("success") and dmarc_res.get("records"):
+                dmarc_data["records"] = dmarc_res["records"]
+                dmarc_data["hasDmarc"] = True
+                for rec in dmarc_res["records"]:
+                    val = rec.get("value", "")
+                    if "v=DMARC1" in val:
+                        for part in val.split(";"):
+                            part = part.strip()
+                            if part.startswith("p="):
+                                dmarc_data["policy"] = part.split("=")[1].strip().lower()
+                            elif part.startswith("rua="):
+                                dmarc_data["rua"] = part.split("=")[1].strip()
+        except Exception:
+            pass
+
     total_count = sum(len(recs) for recs in results.values())
     return {
         "success": True,
-        "domain": domain,
+        "domain": clean_domain,
         "records": results,
+        "dmarc": dmarc_data,
+        "dnssec": is_dnssec,
         "totalCount": total_count
     }
 
@@ -273,6 +485,26 @@ class DNSHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json_response({"success": False, "error": "Missing domain query parameter"}, status=400)
                 return
             self.send_json_response(get_all_domain_records(domain))
+            return
+
+        # /api/asn?ip=...
+        if parsed.path == "/api/asn":
+            params = parse_qs(parsed.query)
+            ip = params.get("ip", [""])[0]
+            if not ip:
+                self.send_json_response({"success": False, "error": "Missing ip parameter"}, status=400)
+                return
+            self.send_json_response(get_ip_asn_info(ip))
+            return
+
+        # /api/http?domain=...
+        if parsed.path == "/api/http":
+            params = parse_qs(parsed.query)
+            domain = params.get("domain", [""])[0]
+            if not domain:
+                self.send_json_response({"success": False, "error": "Missing domain parameter"}, status=400)
+                return
+            self.send_json_response(check_http_health(domain))
             return
 
         # /api/ssl?domain=...

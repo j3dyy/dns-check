@@ -12,6 +12,7 @@ import { initCliModal } from "./components/cli-modal.js";
 import { initSslModal } from "./components/ssl-modal.js";
 import { initNslookupDrawer } from "./components/nslookup-drawer.js";
 import { renderNslookupView } from "./components/nslookup-view.js";
+import { initExportModal } from "./components/export-modal.js";
 
 async function init() {
   const headerMount = document.getElementById("header-mount");
@@ -31,6 +32,7 @@ async function init() {
   initCliModal(modalMount);
   initSslModal(modalMount);
   initNslookupDrawer(modalMount);
+  initExportModal(modalMount);
 
   // Render stable structures once
   renderHeader(headerMount);
@@ -124,6 +126,24 @@ async function init() {
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent("open-nslookup-drawer", { detail: { resolverId: inspectId } }));
     }, 500);
+  }
+
+  // Handle ?modal=export deep link
+  const modalParam = urlParams.get("modal");
+  if (modalParam === "export" || modalParam === "bind" || modalParam === "json") {
+    const trigger = () => {
+      window.dispatchEvent(new CustomEvent("open-export-modal", { detail: { format: modalParam === "json" ? "json" : "bind" } }));
+    };
+    if (store.zoneRecords) {
+      setTimeout(trigger, 100);
+    } else {
+      const unsub = store.subscribe((st, act) => {
+        if (act?.type === "zone-records-update" || act?.type === "zone-loaded") {
+          unsub();
+          setTimeout(trigger, 150);
+        }
+      });
+    }
   }
 }
 

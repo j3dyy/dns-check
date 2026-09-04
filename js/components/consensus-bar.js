@@ -7,6 +7,9 @@ import { store } from "../state.js";
 export function renderConsensusBar(mountEl) {
   const consensus = store.getConsensus();
   const ssl = store.sslInfo;
+  const http = store.httpInfo;
+  const dnssec = store.dnssec;
+  const asn = consensus.dominantValue ? store.asnInfo[consensus.dominantValue] : null;
 
   let badgeClass = "idle";
   let statusText = "Ready to Probe";
@@ -35,7 +38,16 @@ export function renderConsensusBar(mountEl) {
 
           <div class="consensus-stats">
             ${consensus.dominantValue ? `
-              <div>Consensus: <strong>${consensus.dominantValue}</strong></div>
+              <div class="consensus-val-group">
+                <span>Consensus:</span>
+                <strong class="dominant-val-text">${consensus.dominantValue}</strong>
+                ${asn && asn.asn ? `
+                  <span class="asn-pill" title="Network ASN: ${asn.asn} • Route: ${asn.route || 'BGP Anycast'}">
+                    <span class="asn-dot"></span>
+                    <span>${asn.org || asn.asn}</span>
+                  </span>
+                ` : ""}
+              </div>
             ` : ""}
             ${consensus.avgLatency > 0 ? `
               <div>Avg Latency: <strong>${consensus.avgLatency}ms</strong></div>
@@ -44,6 +56,20 @@ export function renderConsensusBar(mountEl) {
         </div>
 
         <div class="consensus-right">
+          ${dnssec !== null ? `
+            <div class="dnssec-pill ${dnssec ? 'valid' : 'unsigned'}" title="${dnssec ? 'DNSSEC Authenticated Data (AD) Flag Verified' : 'DNSSEC Not Configured or Unsigned'}">
+              ${dnssec ? icons.shield(12) : ''}
+              <span>${dnssec ? 'DNSSEC Valid' : 'DNSSEC Unsigned'}</span>
+            </div>
+          ` : ""}
+
+          ${http && http.status ? `
+            <div class="http-pill ${http.status < 400 ? 'ok' : 'warn'}" title="Web Server: ${http.server || 'Unknown'} • Redirect: ${http.redirectCount || 0} hops">
+              <span class="http-live-dot"></span>
+              <span>HTTP ${http.status} &bull; ${http.ttfb}ms</span>
+            </div>
+          ` : ""}
+
           ${ssl && ssl.success ? `
             <button class="ssl-pill" id="btn-open-ssl-modal" title="View SSL/TLS Certificate Info">
               ${icons.lock(14)}

@@ -3,6 +3,7 @@
  */
 import { icons } from "../utils/icons.js";
 import { store } from "../state.js";
+import { showToast } from "../utils/toast.js";
 
 export function renderHeader(mountEl) {
   const isDark = store.theme === "dark";
@@ -49,14 +50,19 @@ export function renderHeader(mountEl) {
     store.toggleTheme();
   });
 
-  document.getElementById("btn-share-url")?.addEventListener("click", () => {
+  document.getElementById("btn-share-url")?.addEventListener("click", async () => {
     store.updateUrlParams();
-    navigator.clipboard.writeText(window.location.href);
-    const btn = document.getElementById("btn-share-url");
-    btn.innerHTML = icons.check(16);
-    setTimeout(() => {
-      btn.innerHTML = icons.share(16);
-    }, 1500);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast("Permalink copied to clipboard! Ready to share.", "success");
+      const btn = document.getElementById("btn-share-url");
+      btn.innerHTML = icons.check(16);
+      setTimeout(() => {
+        btn.innerHTML = icons.share(16);
+      }, 1500);
+    } catch {
+      showToast("Unable to copy permalink", "error");
+    }
   });
 
   document.getElementById("btn-cli-modal")?.addEventListener("click", () => {

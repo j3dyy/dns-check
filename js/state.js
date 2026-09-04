@@ -16,11 +16,27 @@ class DNSStore {
     this.regions = [];
     this.results = {};
     this.sslInfo = null;
+    this.httpInfo = null;
     this.zoneRecords = null;
+    this.asnInfo = {}; // ip -> { asn, org }
+    this.recentSearches = JSON.parse(localStorage.getItem("dns_recents") || "[]");
     this.isLoadingZone = false;
     this.isLoading = false;
     
     this.listeners = new Set();
+  }
+
+  get dnssec() {
+    if (this.zoneRecords && typeof this.zoneRecords.dnssec === "boolean") {
+      return this.zoneRecords.dnssec;
+    }
+    const results = Object.values(this.results);
+    if (results.some((r) => r && r.dnssec === true)) return true;
+    return null;
+  }
+
+  get dmarc() {
+    return this.zoneRecords?.dmarc || null;
   }
 
   subscribe(listener) {
@@ -121,10 +137,15 @@ class DNSStore {
 
     this.isLoading = true;
     this.sslInfo = null;
+    this.httpInfo = null;
     this.notify({ type: "start-probing" });
 
-    // Trigger SSL inspection & Zone records discovery concurrently
+    // Save to recents
+    this.addRecentSearch(this.domain);
+
+    // Trigger SSL inspection, HTTP health & Zone records discovery concurrently
     this.fetchSSLInfo(this.domain);
+    this.fetchHttpInfo(this.domain);
     this.fetchZone(this.domain);
 
     // Target type for 16 edge resolvers (if 'ALL', defaults edge cards to 'A' record)
@@ -134,12 +155,34 @@ class DNSStore {
     const promises = this.resolvers.map(async (resolver) => {
       const result = await queryResolver(resolver, this.domain, probeType);
       this.results[resolver.id] = result;
+      if (result.primaryValue && /^[\d\.:]+$/.test(result.primaryValue)) {
+        this.fetchAsnInfo(result.primaryValue);
+      }
       this.notify({ type: "resolver-update", resolverId: resolver.id });
     });
 
     await Promise.allSettled(promises);
     this.isLoading = false;
     this.notify({ type: "finished-probing" });
+  }
+
+  addRecentSearch(domain) {
+    if (!domain) return;
+    const clean = cleanDomain(domain);
+    if (!isValidDomain(clean)) return;
+    this.recentSearches = [clean, ...this.recentSearches.filter((d) => d !== clean)].slice(0, 6);
+    try {
+      localStorage.setItem("dns_recents", JSON.stringify(this.recentSearches));
+    } catch {}
+    this.notify({ type: "recent-updated" });
+  }
+
+  removeRecentSearch(domain) {
+    this.recentSearches = this.recentSearches.filter((d) => d !== domain);
+    try {
+      localStorage.setItem("dns_recents", JSON.stringify(this.recentSearches));
+    } catch {}
+    this.notify({ type: "recent-updated" });
   }
 
   async fetchZone(domain) {
@@ -151,6 +194,14 @@ class DNSStore {
       const data = await fetchZoneRecords(domain);
       if (data && data.success) {
         this.zoneRecords = data;
+        // Also fetch ASN for discovered A records
+        if (data.records?.A) {
+          data.records.A.forEach((r) => {
+            if (r.value && /^[\d\.:]+$/.test(r.value)) {
+              this.fetchAsnInfo(r.value);
+            }
+          });
+        }
         this.notify({ type: "zone-records-update", data });
       }
     } catch (err) {
@@ -174,6 +225,33 @@ class DNSStore {
     } catch (e) {
       // Backend /api/ssl might not be reached if running on pure static host, silently ignore
     }
+  }
+
+  async fetchHttpInfo(domain) {
+    try {
+      const res = await fetch(`/api/http?domain=${encodeURIComponent(domain)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          this.httpInfo = data;
+          this.notify({ type: "http-update" });
+        }
+      }
+    } catch (e) {}
+  }
+
+  async fetchAsnInfo(ip) {
+    if (!ip || this.asnInfo[ip]) return;
+    try {
+      const res = await fetch(`/api/asn?ip=${encodeURIComponent(ip)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          this.asnInfo[ip] = data;
+          this.notify({ type: "asn-update", ip });
+        }
+      }
+    } catch (e) {}
   }
 
   /**

@@ -40,6 +40,14 @@ export function renderSearchBar(mountEl) {
             </button>
           </form>
 
+          <!-- Recent Searches History Strip -->
+          <div class="sample-try-row recent-history-row" id="recent-searches-row" style="${store.recentSearches.length > 0 ? '' : 'display: none;'}">
+            <span class="sample-label">RECENT:</span>
+            <div class="recent-chips-wrap" id="recent-chips-container">
+              ${renderRecentChips(store.recentSearches)}
+            </div>
+          </div>
+
           <!-- Quick Demo Suggestions Strip -->
           <div class="sample-try-row">
             <span class="sample-label">QUICK TEST:</span>
@@ -124,6 +132,47 @@ export function renderSearchBar(mountEl) {
   expInput?.addEventListener("input", (e) => {
     store.setExpectedValue(e.target.value);
   });
+
+  // Attach Recent search listeners
+  const recentContainer = document.getElementById("recent-chips-container");
+  if (recentContainer) {
+    attachRecentListeners(recentContainer);
+  }
+}
+
+function renderRecentChips(recents) {
+  if (!recents || recents.length === 0) return "";
+  return recents.map((d) => `
+    <div class="recent-chip-item">
+      <button type="button" class="sample-chip recent-domain-chip" data-domain="${d}">${d}</button>
+      <button type="button" class="recent-remove-btn" data-remove="${d}" title="Remove ${d} from history">&times;</button>
+    </div>
+  `).join("");
+}
+
+function attachRecentListeners(container) {
+  container.querySelectorAll(".recent-domain-chip").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const d = btn.getAttribute("data-domain");
+      const input = document.getElementById("domain-input");
+      if (input && d) {
+        input.value = d;
+        store.setDomain(d);
+        store.queryAll();
+      }
+    });
+  });
+
+  container.querySelectorAll(".recent-remove-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const d = btn.getAttribute("data-remove");
+      if (d) {
+        store.removeRecentSearch(d);
+      }
+    });
+  });
 }
 
 export function updateSearchBarState() {
@@ -142,6 +191,19 @@ export function updateSearchBarState() {
     } else {
       icon.classList.remove("is-spinning");
       text.textContent = "Test DNS";
+    }
+  }
+
+  // Update Recent Searches Strip
+  const recentRow = document.getElementById("recent-searches-row");
+  const recentContainer = document.getElementById("recent-chips-container");
+  if (recentRow && recentContainer) {
+    if (store.recentSearches && store.recentSearches.length > 0) {
+      recentRow.style.display = "";
+      recentContainer.innerHTML = renderRecentChips(store.recentSearches);
+      attachRecentListeners(recentContainer);
+    } else {
+      recentRow.style.display = "none";
     }
   }
 
