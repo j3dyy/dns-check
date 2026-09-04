@@ -7,7 +7,7 @@ import { cleanDomain, isValidDomain } from "./utils/formatters.js";
 class DNSStore {
   constructor() {
     this.domain = "";
-    this.recordType = "A";
+    this.recordType = "ALL";
     this.expectedValue = "";
     this.theme = localStorage.getItem("dns_theme") || "dark";
     this.viewMode = "grid"; // "grid" | "nslookup"
@@ -88,9 +88,9 @@ class DNSStore {
       url.searchParams.delete("d");
       url.searchParams.delete("q");
     }
-    if (this.recordType && this.recordType !== "A") {
+    if (this.recordType && this.recordType !== "ALL") {
       url.searchParams.set("t", this.recordType);
-    } else if (!this.domain) {
+    } else {
       url.searchParams.delete("t");
       url.searchParams.delete("type");
     }
@@ -108,7 +108,11 @@ class DNSStore {
     const t = url.searchParams.get("t") || url.searchParams.get("type");
     const v = url.searchParams.get("view");
     if (d) this.domain = cleanDomain(d);
-    if (t) this.recordType = t.toUpperCase();
+    if (t) {
+      this.recordType = t.toUpperCase();
+    } else {
+      this.recordType = "ALL";
+    }
     if (v === "nslookup" || v === "grid") this.viewMode = v;
   }
 

@@ -196,7 +196,8 @@ export function updateResolverCard(resolverId) {
     if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-rose);">${icons.x(14)}</span>`;
   } else if (res.status === "empty") {
     card.classList.add("is-differing");
-    if (valEl) valEl.innerHTML = `<span style="color: var(--text-dim);">No ${store.recordType} Records</span>`;
+    const displayType = store.recordType === "ALL" ? "A" : store.recordType;
+    if (valEl) valEl.innerHTML = `<span style="color: var(--text-dim);">No ${displayType} Records</span>`;
     if (ttlEl) ttlEl.textContent = "";
     if (statusIconEl) statusIconEl.innerHTML = `<span style="color: var(--brand-amber);">${icons.alertTriangle(14)}</span>`;
   } else {
