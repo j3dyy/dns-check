@@ -15,6 +15,7 @@ import socket
 import ssl
 import struct
 import time
+import concurrent.futures
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timezone
 
@@ -32,6 +33,8 @@ TYPE_MAP = {
     "AAAA": 28,
     "CAA": 257
 }
+
+RTYPE_NAMES = {v: k for k, v in TYPE_MAP.items()}
 
 
 def parse_name(data, offset):
@@ -120,7 +123,7 @@ def query_dns_udp(server_ip, domain, qtype_str="A", timeout=3.0):
                 val = socket.inet_ntoa(rdata_raw)
             elif rtype == 28 and rdlen == 16:
                 val = socket.inet_ntop(socket.AF_INET6, rdata_raw)
-            elif rtype in (2, 5):
+            elif rtype in (2, 5, 12):
                 val, _ = parse_name(data, offset)
             elif rtype == 15:
                 pref = struct.unpack(">H", rdata_raw[:2])[0]
@@ -139,13 +142,21 @@ def query_dns_udp(server_ip, domain, qtype_str="A", timeout=3.0):
                 mname, next_off = parse_name(data, offset)
                 rname, next_off = parse_name(data, next_off)
                 val = f"{mname} {rname}"
+            elif rtype == 257 and rdlen >= 2:  # CAA (RFC 6844)
+                flags = rdata_raw[0]
+                taglen = rdata_raw[1]
+                if 2 + taglen <= rdlen:
+                    tag = rdata_raw[2:2+taglen].decode("ascii", errors="ignore")
+                    val_str = rdata_raw[2+taglen:].decode("utf-8", errors="ignore")
+                    val = f'{flags} {tag} "{val_str}"'
             else:
                 val = rdata_raw.hex()
 
             offset += rdlen
 
             if val:
-                records.append({"value": val, "ttl": ttl, "type": qtype_str})
+                actual_type = RTYPE_NAMES.get(rtype, qtype_str)
+                records.append({"value": val, "ttl": ttl, "type": actual_type})
                 if min_ttl is None or ttl < min_ttl:
                     min_ttl = ttl
 
@@ -219,12 +230,50 @@ def get_ssl_cert_info(domain):
         }
 
 
+def get_all_domain_records(domain, server_ip="1.1.1.1"):
+    types_to_query = ["A", "AAAA", "CNAME", "MX", "NS", "TXT", "CAA", "SOA"]
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        future_to_type = {
+            executor.submit(query_dns_udp, server_ip, domain, t, 3.0): t
+            for t in types_to_query
+        }
+        for future in concurrent.futures.as_completed(future_to_type):
+            t = future_to_type[future]
+            try:
+                res = future.result()
+                if res.get("success") and res.get("records"):
+                    results[t] = res["records"]
+                else:
+                    results[t] = []
+            except Exception:
+                results[t] = []
+
+    total_count = sum(len(recs) for recs in results.values())
+    return {
+        "success": True,
+        "domain": domain,
+        "records": results,
+        "totalCount": total_count
+    }
+
+
 class DNSHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
     def do_GET(self):
         parsed = urlparse(self.path)
+
+        # /api/records?domain=...
+        if parsed.path == "/api/records":
+            params = parse_qs(parsed.query)
+            domain = params.get("domain", [""])[0]
+            if not domain:
+                self.send_json_response({"success": False, "error": "Missing domain query parameter"}, status=400)
+                return
+            self.send_json_response(get_all_domain_records(domain))
+            return
 
         # /api/ssl?domain=...
         if parsed.path == "/api/ssl":

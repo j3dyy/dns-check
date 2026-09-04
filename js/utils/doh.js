@@ -36,12 +36,13 @@ export async function queryResolver(resolver, domain, type = "A", timeoutMs = 35
       clearTimeout(timer);
       const data = await apiRes.json();
       if (data.success) {
+        const targetRec = data.records.find((r) => r.type === type) || data.records[0];
         return {
           resolverId: resolver.id,
           success: true,
           status: data.status,
           records: data.records,
-          primaryValue: data.records[0]?.value || null,
+          primaryValue: targetRec?.value || null,
           rawValues: data.records.map((r) => r.value),
           ttl: data.ttl,
           dnssec: false,
@@ -81,13 +82,14 @@ export async function queryResolver(resolver, domain, type = "A", timeoutMs = 35
 
     const data = await response.json();
     const parsed = parseDoHResponse(data, type);
+    const targetRec = parsed.records.find((r) => r.type === type) || parsed.records[0];
 
     return {
       resolverId: resolver.id,
       success: true,
       status: parsed.status,
       records: parsed.records,
-      primaryValue: parsed.records[0]?.value || null,
+      primaryValue: targetRec?.value || null,
       rawValues: parsed.records.map((r) => r.value),
       ttl: parsed.minTTL,
       dnssec: data.AD === true,
@@ -101,8 +103,8 @@ export async function queryResolver(resolver, domain, type = "A", timeoutMs = 35
     return {
       resolverId: resolver.id,
       success: false,
-      status: "error",
-      error: isTimeout ? "Timeout (>3.5s)" : (err.message || "Query Failed"),
+      status: isTimeout ? "timeout" : "error",
+      error: isTimeout ? "Query timed out (>3.5s)" : err.message,
       records: [],
       primaryValue: null,
       rawValues: [],
@@ -111,6 +113,60 @@ export async function queryResolver(resolver, domain, type = "A", timeoutMs = 35
       latency: Math.round(latency)
     };
   }
+}
+
+/**
+ * Fetch complete DNS Zone records overview for a domain (MX, NS, CNAME, TXT, A, AAAA, CAA, SOA)
+ */
+export async function fetchZoneRecords(domain) {
+  if (!domain) return null;
+  const clean = domain.trim().toLowerCase();
+
+  // 1. Try Backend UDP endpoint first (fast parallel socket queries)
+  try {
+    const res = await fetch(`/api/records?domain=${encodeURIComponent(clean)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        return data;
+      }
+    }
+  } catch (e) {
+    // Backend unavailable, fallback to client DoH below
+  }
+
+  // 2. Client DoH fallback (Cloudflare DNS over HTTPS)
+  const types = ["A", "AAAA", "CNAME", "MX", "NS", "TXT", "CAA", "SOA"];
+  const results = {};
+  let totalCount = 0;
+
+  await Promise.allSettled(
+    types.map(async (t) => {
+      try {
+        const dohRes = await fetch(
+          `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(clean)}&type=${t}`,
+          { headers: { Accept: "application/dns-json" } }
+        );
+        if (dohRes.ok) {
+          const data = await dohRes.json();
+          const parsed = parseDoHResponse(data, t);
+          results[t] = parsed.records || [];
+          totalCount += results[t].length;
+        } else {
+          results[t] = [];
+        }
+      } catch {
+        results[t] = [];
+      }
+    })
+  );
+
+  return {
+    success: true,
+    domain: clean,
+    records: results,
+    totalCount
+  };
 }
 
 /**

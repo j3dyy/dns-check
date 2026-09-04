@@ -162,9 +162,16 @@ export function updateResolverCard(resolverId) {
   // Update Status & Value
   if (res.success && res.primaryValue) {
     const val = res.primaryValue;
-    if (valEl) valEl.textContent = val;
+    const extraCount = res.records && res.records.length > 1 ? res.records.length - 1 : 0;
+    if (valEl) {
+      if (extraCount > 0) {
+        valEl.innerHTML = `<span class="val-text-primary">${val}</span> <span class="multi-count-chip" title="${res.records.length} total records returned">+${extraCount}</span>`;
+      } else {
+        valEl.textContent = val;
+      }
+    }
     if (ttlEl) ttlEl.textContent = res.ttl ? `TTL ${formatTTL(res.ttl)}` : "";
-    if (bottomEl) bottomEl.setAttribute("data-copy", val);
+    if (bottomEl) bottomEl.setAttribute("data-copy", res.records && res.records.length > 1 ? res.records.map((r) => r.value).join("\n") : val);
 
     // Matching logic
     if (expected) {

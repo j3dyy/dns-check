@@ -4,7 +4,7 @@
 import { icons } from "../utils/icons.js";
 import { store } from "../state.js";
 
-const RECORD_TYPES = ["A", "AAAA", "CNAME", "MX", "TXT", "NS", "CAA", "SOA", "PTR"];
+const RECORD_TYPES = ["ALL", "A", "AAAA", "CNAME", "MX", "TXT", "NS", "CAA", "SOA", "PTR"];
 
 let isMounted = false;
 

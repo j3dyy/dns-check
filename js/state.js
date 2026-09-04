@@ -1,7 +1,7 @@
 /**
  * DNS.usectl.com - Reactive State Store
  */
-import { queryResolver } from "./utils/doh.js";
+import { queryResolver, fetchZoneRecords } from "./utils/doh.js";
 import { cleanDomain, isValidDomain } from "./utils/formatters.js";
 
 class DNSStore {
@@ -16,6 +16,8 @@ class DNSStore {
     this.regions = [];
     this.results = {};
     this.sslInfo = null;
+    this.zoneRecords = null;
+    this.isLoadingZone = false;
     this.isLoading = false;
     
     this.listeners = new Set();
@@ -117,12 +119,16 @@ class DNSStore {
     this.sslInfo = null;
     this.notify({ type: "start-probing" });
 
-    // Trigger SSL inspection in parallel
+    // Trigger SSL inspection & Zone records discovery concurrently
     this.fetchSSLInfo(this.domain);
+    this.fetchZone(this.domain);
+
+    // Target type for 16 edge resolvers (if 'ALL', defaults edge cards to 'A' record)
+    const probeType = this.recordType === "ALL" ? "A" : this.recordType;
 
     // Query all DoH resolvers concurrently
     const promises = this.resolvers.map(async (resolver) => {
-      const result = await queryResolver(resolver, this.domain, this.recordType);
+      const result = await queryResolver(resolver, this.domain, probeType);
       this.results[resolver.id] = result;
       this.notify({ type: "resolver-update", resolverId: resolver.id });
     });
@@ -130,6 +136,25 @@ class DNSStore {
     await Promise.allSettled(promises);
     this.isLoading = false;
     this.notify({ type: "finished-probing" });
+  }
+
+  async fetchZone(domain) {
+    if (!domain || !isValidDomain(domain)) return;
+    this.isLoadingZone = true;
+    this.zoneRecords = null;
+    this.notify({ type: "zone-loading" });
+    try {
+      const data = await fetchZoneRecords(domain);
+      if (data && data.success) {
+        this.zoneRecords = data;
+        this.notify({ type: "zone-records-update", data });
+      }
+    } catch (err) {
+      console.error("[DNS.usectl.com] Failed to fetch zone records:", err);
+    } finally {
+      this.isLoadingZone = false;
+      this.notify({ type: "zone-loaded" });
+    }
   }
 
   async fetchSSLInfo(domain) {

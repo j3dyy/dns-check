@@ -6,6 +6,7 @@ import { isValidDomain } from "./utils/formatters.js";
 import { renderHeader } from "./components/header.js";
 import { renderSearchBar, updateSearchBarState } from "./components/search-bar.js";
 import { renderConsensusBar } from "./components/consensus-bar.js";
+import { renderZoneRecords } from "./components/zone-records.js";
 import { renderResolverGrid, updateResolverCard, updateAllResolverCards } from "./components/resolver-grid.js";
 import { initCliModal } from "./components/cli-modal.js";
 import { initSslModal } from "./components/ssl-modal.js";
@@ -16,6 +17,7 @@ async function init() {
   const headerMount = document.getElementById("header-mount");
   const searchMount = document.getElementById("search-mount");
   const consensusMount = document.getElementById("consensus-mount");
+  const zoneMount = document.getElementById("zone-mount");
   const gridMount = document.getElementById("grid-mount");
   const modalMount = document.getElementById("modal-mount");
 
@@ -34,6 +36,7 @@ async function init() {
   renderHeader(headerMount);
   renderSearchBar(searchMount);
   renderConsensusBar(consensusMount);
+  renderZoneRecords(zoneMount);
 
   // Initial main content render
   if (store.viewMode === "nslookup") {
@@ -44,6 +47,17 @@ async function init() {
   store.subscribe((state, action) => {
     // 1. Consensus bar updates smoothly
     renderConsensusBar(consensusMount);
+
+    // 2. Zone records panel updates
+    if (
+      action?.type === "zone-records-update" ||
+      action?.type === "zone-loading" ||
+      action?.type === "zone-loaded" ||
+      action?.type === "start-probing" ||
+      action?.type === "finished-probing"
+    ) {
+      renderZoneRecords(zoneMount);
+    }
 
     // 2. Search bar updates button spinner & active pills without rebuilding inputs
     updateSearchBarState();
