@@ -173,5 +173,34 @@ export const icons = {
       <polyline points="15 3 21 3 21 9"></polyline>
       <line x1="10" y1="14" x2="21" y2="3"></line>
     </svg>
+  `,
+
+  grid: (size = 14, cls = "") => `
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${cls}">
+      <rect x="3" y="3" width="7" height="7"></rect>
+      <rect x="14" y="3" width="7" height="7"></rect>
+      <rect x="14" y="14" width="7" height="7"></rect>
+      <rect x="3" y="14" width="7" height="7"></rect>
+    </svg>
+  `,
+
+  columns: (size = 14, cls = "") => `
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${cls}">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="12" y1="3" x2="12" y2="21"></line>
+    </svg>
+  `,
+
+  chevronLeft: (size = 14, cls = "") => `
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="${cls}">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  `,
+
+  chevronRight: (size = 14, cls = "") => `
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="${cls}">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
   `
 };
+

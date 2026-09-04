@@ -54,15 +54,30 @@ export function renderConsensusBar(mountEl) {
               ${icons.alertTriangle(14)}
               <span>SSL Warning</span>
             </button>
-          ` : `
-            <span style="font-size: 0.78rem; color: var(--text-dim);">
-              Checking ${store.resolvers.length} Global Edge Nodes
-            </span>
-          `}
+          ` : ""}
+
+          <div class="view-mode-toggle">
+            <button class="view-mode-btn ${store.viewMode === 'grid' ? 'active' : ''}" id="btn-view-grid" title="Standard Resolver Grid View">
+              ${icons.grid(13)}
+              <span>Grid</span>
+            </button>
+            <button class="view-mode-btn ${store.viewMode === 'nslookup' ? 'active' : ''}" id="btn-view-nslookup" title="nslookup Cross-Check Terminal Workstation">
+              ${icons.terminal(13)}
+              <span>nslookup Cross-Check</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   `;
+
+  document.getElementById("btn-view-grid")?.addEventListener("click", () => {
+    store.setViewMode("grid");
+  });
+
+  document.getElementById("btn-view-nslookup")?.addEventListener("click", () => {
+    store.setViewMode("nslookup");
+  });
 
   document.getElementById("btn-open-ssl-modal")?.addEventListener("click", () => {
     const ev = new CustomEvent("open-ssl-modal");

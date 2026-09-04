@@ -10,6 +10,7 @@ class DNSStore {
     this.recordType = "A";
     this.expectedValue = "";
     this.theme = localStorage.getItem("dns_theme") || "dark";
+    this.viewMode = "grid"; // "grid" | "nslookup"
     
     this.resolvers = [];
     this.regions = [];
@@ -59,6 +60,13 @@ class DNSStore {
     this.notify({ type: "expected-updated" });
   }
 
+  setViewMode(mode) {
+    if (mode !== "grid" && mode !== "nslookup") return;
+    this.viewMode = mode;
+    this.updateUrlParams();
+    this.notify({ type: "view-mode-changed", viewMode: mode });
+  }
+
   toggleTheme() {
     this.theme = this.theme === "dark" ? "light" : "dark";
     localStorage.setItem("dns_theme", this.theme);
@@ -70,6 +78,11 @@ class DNSStore {
     const url = new URL(window.location);
     if (this.domain) url.searchParams.set("d", this.domain);
     if (this.recordType) url.searchParams.set("t", this.recordType);
+    if (this.viewMode && this.viewMode !== "grid") {
+      url.searchParams.set("view", this.viewMode);
+    } else {
+      url.searchParams.delete("view");
+    }
     window.history.replaceState({}, "", url);
   }
 
@@ -77,8 +90,10 @@ class DNSStore {
     const url = new URL(window.location);
     const d = url.searchParams.get("d") || url.searchParams.get("q");
     const t = url.searchParams.get("t") || url.searchParams.get("type");
+    const v = url.searchParams.get("view");
     if (d) this.domain = cleanDomain(d);
     if (t) this.recordType = t.toUpperCase();
+    if (v === "nslookup" || v === "grid") this.viewMode = v;
   }
 
   async queryAll() {

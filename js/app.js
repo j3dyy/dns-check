@@ -8,6 +8,8 @@ import { renderConsensusBar } from "./components/consensus-bar.js";
 import { renderResolverGrid, updateResolverCard, updateAllResolverCards } from "./components/resolver-grid.js";
 import { initCliModal } from "./components/cli-modal.js";
 import { initSslModal } from "./components/ssl-modal.js";
+import { initNslookupDrawer } from "./components/nslookup-drawer.js";
+import { renderNslookupView } from "./components/nslookup-view.js";
 
 async function init() {
   const headerMount = document.getElementById("header-mount");
@@ -22,14 +24,20 @@ async function init() {
   // Parse deep link params
   store.parseUrlParams();
 
-  // Setup modals
+  // Setup modals & slide-over drawer
   initCliModal(modalMount);
   initSslModal(modalMount);
+  initNslookupDrawer(modalMount);
 
   // Render stable structures once
   renderHeader(headerMount);
   renderSearchBar(searchMount);
   renderConsensusBar(consensusMount);
+
+  // Initial main content render
+  if (store.viewMode === "nslookup") {
+    renderNslookupView(gridMount);
+  }
 
   // Subscribe fine-grained reactive updates
   store.subscribe((state, action) => {
@@ -39,8 +47,16 @@ async function init() {
     // 2. Search bar updates button spinner & active pills without rebuilding inputs
     updateSearchBarState();
 
-    // 3. Resolver cards update in-place with zero DOM destruction
-    if (action?.type === "resolver-update") {
+    // 3. View switching or view-specific renders
+    if (state.viewMode === "nslookup") {
+      renderNslookupView(gridMount);
+      return;
+    }
+
+    // Grid View Updates (stable in-place updates)
+    if (action?.type === "view-mode-changed") {
+      renderResolverGrid(gridMount);
+    } else if (action?.type === "resolver-update") {
       updateResolverCard(action.resolverId);
     } else if (action?.type === "resolvers-loaded") {
       renderResolverGrid(gridMount);
@@ -81,6 +97,16 @@ async function init() {
   // Load resolvers dataset & trigger initial query
   await store.loadResolvers();
   store.queryAll();
+
+  // Handle ?inspect={resolverId} deep link to open drawer automatically
+  const urlParams = new URLSearchParams(window.location.search);
+  const inspectId = urlParams.get("inspect");
+  if (inspectId) {
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("open-nslookup-drawer", { detail: { resolverId: inspectId } }));
+    }, 500);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);
+

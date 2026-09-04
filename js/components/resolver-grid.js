@@ -8,7 +8,8 @@ import { store } from "../state.js";
 let isMounted = false;
 
 export function renderResolverGrid(mountEl) {
-  if (!isMounted) {
+  const firstId = store.resolvers[0]?.id;
+  if (!isMounted || !document.getElementById(`card-${firstId}`)) {
     mountGridStructure(mountEl);
     isMounted = true;
   }
@@ -49,7 +50,7 @@ function mountGridStructure(mountEl) {
           ${regResolvers.map((r) => `
             <div class="resolver-card" id="card-${r.id}">
               <div class="resolver-card-top">
-                <div class="resolver-info">
+                <div class="resolver-info" id="info-${r.id}" title="Click to inspect nslookup session">
                   <span class="resolver-flag">${r.flag || "🌐"}</span>
                   <div class="resolver-title-col">
                     <span class="resolver-name">${r.name}</span>
@@ -58,6 +59,9 @@ function mountGridStructure(mountEl) {
                 </div>
 
                 <div class="resolver-meta-badges">
+                  <button class="btn-card-nslookup" id="btn-nslookup-${r.id}" title="Inspect nslookup session">
+                    ${icons.terminal(12)}
+                  </button>
                   <span class="latency-badge" id="latency-${r.id}" style="display: none;"></span>
                   <span id="status-icon-${r.id}"></span>
                 </div>
@@ -81,8 +85,9 @@ function mountGridStructure(mountEl) {
   html += `</div>`;
   mountEl.innerHTML = html;
 
-  // Add click to copy
+  // Add click to copy and click to open nslookup drawer
   resolvers.forEach((r) => {
+    // Copy record
     const bottom = document.getElementById(`bottom-${r.id}`);
     bottom?.addEventListener("click", () => {
       const val = bottom.getAttribute("data-copy");
@@ -98,6 +103,18 @@ function mountGridStructure(mountEl) {
         }
       }
     });
+
+    // Open nslookup drawer
+    const openDrawer = () => {
+      window.dispatchEvent(new CustomEvent("open-nslookup-drawer", { detail: { resolverId: r.id } }));
+    };
+
+    document.getElementById(`btn-nslookup-${r.id}`)?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openDrawer();
+    });
+
+    document.getElementById(`info-${r.id}`)?.addEventListener("click", openDrawer);
   });
 }
 
